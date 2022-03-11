@@ -25,6 +25,7 @@ inital_cogs = (
 
 config = json.load(open("config.json"))
 
+
 async def run():
     logger = logging.getLogger("discord")
     logger.setLevel(logging.WARNING)
@@ -40,20 +41,23 @@ async def run():
     )
     logger.addHandler(handler)
     session = aiohttp.ClientSession()
-    client: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(config['database-uri'])
+    client: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(
+        config["database-uri"]
+    )
     # client: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient()
     bot = Duck(db=client, session=session)
 
     try:
         # bpaT223O28SWA6MT
         await bot.start(
-            config['bot-token'],  # main
+            config["bot-token"],  # main
             reconnect=True,
         )
     except KeyboardInterrupt:
         print("Bot is going byebye ;-;")
     finally:
         await bot.close()
+
 
 class Duck(commands.Bot):
     def __init__(self, **kwargs):
