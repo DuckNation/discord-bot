@@ -44,7 +44,6 @@ async def run():
     client: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(
         config["database-uri"]
     )
-    # client: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient()
     bot = Duck(db=client, session=session)
 
     try:
