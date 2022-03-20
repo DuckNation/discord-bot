@@ -27,6 +27,7 @@ _modules = (
     "modules.snipe",
     "modules.admin",
     "modules.antiOk",
+    "modules.antiabuse",
 )
 
 
@@ -62,6 +63,7 @@ class Duck(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.sqlite = await aiosqlite.connect("duck.db")
+        self.session = aiohttp.ClientSession()
         for ext in _modules:
             try:
                 await self.load_extension(ext)

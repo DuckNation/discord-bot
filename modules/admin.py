@@ -234,7 +234,7 @@ class Admin(commands.Cog):
     def __init__(self, bot):
         self.default = None
         self.author = None
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
     async def cog_check(self, ctx):
         return ctx.author.id in self.bot.owner_ids
@@ -342,6 +342,17 @@ class Admin(commands.Cog):
             elif ctx.guild.id in (463986890190749698, 494911447420108820):
                 return prefix + "-jp"
         return prefix
+
+    @commands.command()
+    @commands.is_owner()
+    async def reload_commands(self, ctx: commands.Context, all=False):
+        await ctx.send("Syncing command tree.")
+        if all:
+            await self.bot.tree.sync()
+            await ctx.send("Synced global commands!")
+        else:
+            await self.bot.tree.sync(guild=discord.Object(id=790774812690743306))
+            await ctx.send("Synced guild commands!")
 
     @commands.group(aliases=["rtfd"], invoke_without_command=True, hidden=True)
     async def rtfm(self, ctx, *, obj: str = None):
