@@ -362,5 +362,5 @@ class Admin(commands.Cog):
         await self.do_rtfm(ctx, key, obj)
 
 
-def setup(bot):
-    bot.add_cog(Admin(bot))
+async def setup(bot):
+    await bot.add_cog(Admin(bot))

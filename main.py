@@ -24,6 +24,7 @@ config = json.load(open("config.json"))
 
 _modules = (
     "modules.snipe",
+    "modules.admin",
 )
 
 class Duck(commands.Bot):
