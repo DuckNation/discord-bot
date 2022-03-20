@@ -71,6 +71,11 @@ class Duck(commands.Bot):
             except Exception as e:
                 print(e)
 
+    async def close(self) -> None:
+        await self.session.close()
+        await self.sqlite.close()
+        await self.close()
+
     async def on_ready(self):
         print("Bot is ready.")
         # await self.load_extension('modules.slashPain')
