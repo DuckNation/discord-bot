@@ -23,6 +23,7 @@ import pymongo
 config = json.load(open("config.json"))
 
 _modules = (
+    "modules.utils.errorHandling",
     "modules.snipe",
     "modules.admin",
     "modules.antiOk",
