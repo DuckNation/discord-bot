@@ -54,7 +54,7 @@ class ChatEvents(commands.Cog):
             self.failed_attempts[message.author.id] = 0
 
         self.failed_attempts[message.author.id] = (
-                self.failed_attempts[message.author.id] + 1
+            self.failed_attempts[message.author.id] + 1
         )
 
         if self.failed_attempts[message.author.id] > 2:
