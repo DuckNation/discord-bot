@@ -38,7 +38,7 @@ class Snipe(commands.Cog):
     async def cog_load(self) -> None:
         self.clear_snipes.start()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(minutes=3)
     async def clear_snipes(self):
         self.messages = {}
         self.edited = {}
