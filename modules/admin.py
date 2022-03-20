@@ -223,7 +223,7 @@ class SphinxObjectFileReader:
             pos = buf.find(b"\n")
             while pos != -1:
                 yield buf[:pos].decode("utf-8")
-                buf = buf[pos + 1:]
+                buf = buf[pos + 1 :]
                 pos = buf.find(b"\n")
 
 
@@ -231,7 +231,6 @@ timezone = pytz.timezone("America/Chicago")
 
 
 class Admin(commands.Cog):
-
     def __init__(self, bot):
         self.default = None
         self.author = None

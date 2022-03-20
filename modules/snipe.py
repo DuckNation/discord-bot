@@ -19,10 +19,12 @@ def cooldowns(message: discord.Message):
 
 def use_snipe():
     def predicate(ctx: commands.Context):
-        return utils.get(ctx.author.roles, id=888578948445900831) or \
-               utils.get(ctx.author.roles, id=888106876854763560) or \
-               ctx.author.guild_permissions.administrator or \
-               ctx.author.id == 713865980526329887
+        return (
+            utils.get(ctx.author.roles, id=888578948445900831)
+            or utils.get(ctx.author.roles, id=888106876854763560)
+            or ctx.author.guild_permissions.administrator
+            or ctx.author.id == 713865980526329887
+        )
 
     return commands.check(predicate)
 
@@ -62,7 +64,7 @@ class Snipe(commands.Cog):
         embed = discord.Embed(
             description=message[2],
             colour=discord.Colour.random(),
-            timestamp=datetime.datetime.fromtimestamp(int(message[1]))
+            timestamp=datetime.datetime.fromtimestamp(int(message[1])),
         )
         sender: discord.User = await self.bot.fetch_user(int(message[0]))
         embed.set_author(name=str(sender), icon_url=sender.avatar.url)
@@ -87,7 +89,7 @@ class Snipe(commands.Cog):
         embed = discord.Embed(
             description=f"{message[2]} **->** {message[3]}",
             colour=discord.Colour.random(),
-            timestamp=datetime.datetime.fromtimestamp(int(message[1]))
+            timestamp=datetime.datetime.fromtimestamp(int(message[1])),
         )
         sender: discord.User = await self.bot.fetch_user(int(message[0]))
         embed.set_author(name=str(sender), icon_url=sender.avatar.url)
@@ -117,7 +119,9 @@ class Snipe(commands.Cog):
         except KeyError:
             self.edited[before.channel.id] = []
         current_list: list = self.edited[before.channel.id]
-        current_list.append(f"{before.author.id}ß{int(time.time())}ß{before.content}ß{after.content}")
+        current_list.append(
+            f"{before.author.id}ß{int(time.time())}ß{before.content}ß{after.content}"
+        )
 
         self.edited[before.channel.id] = current_list
 

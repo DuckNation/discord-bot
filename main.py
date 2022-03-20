@@ -27,6 +27,7 @@ _modules = (
     "modules.admin",
 )
 
+
 class Duck(commands.Bot):
     def __init__(self, **kwargs):
         allowed_mentions = discord.AllowedMentions(
