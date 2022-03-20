@@ -25,11 +25,13 @@ config = json.load(open("config.json"))
 _modules = (
     "modules.snipe",
     "modules.admin",
+    "modules.antiOk",
 )
 
 
 class Duck(commands.Bot):
     def __init__(self, **kwargs):
+        self.sqlite = None
         allowed_mentions = discord.AllowedMentions(
             roles=False, everyone=False, users=True
         )
@@ -58,6 +60,7 @@ class Duck(commands.Bot):
         )
 
     async def setup_hook(self) -> None:
+        self.sqlite = await aiosqlite.connect("duck.db")
         for ext in _modules:
             try:
                 await self.load_extension(ext)
