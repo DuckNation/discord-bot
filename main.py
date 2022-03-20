@@ -49,7 +49,9 @@ class Duck(commands.Bot):
             case_insensitive=True,
             strip_after_prefix=True,
             owner_ids=(
-                578006934507094016,
+                578006934507094016,  # haappi
+                255436078868070401,  # alys
+                354297568165101569,  # scold
             ),
             intents=intents,
         )
