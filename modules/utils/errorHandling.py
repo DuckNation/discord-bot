@@ -11,9 +11,45 @@ class ErrorHandler(commands.Cog):
             1, 10, commands.BucketType.member
         )
 
+    def get_command_signature(self, command: commands.Command):
+        parent = command.full_parent_name
+        if len(command.aliases) > 0:
+            aliases = "|".join(command.aliases)
+            fmt = f"^{command.name}|{aliases}"
+            if parent:
+                fmt = f"{parent} {fmt}"
+            alias = fmt
+        else:
+            alias = command.name if not parent else f"{parent} {command.name}"
+        return f"```xml\n<{alias}: {command.signature} >```\n"
+
+    async def send_command_help(self, ctx: commands.Context, command: commands.Command):
+        embed = discord.Embed(colour=0xFF00FF)
+        embed.set_footer(
+            text=f"{str(self.bot.user.name)} help", icon_url=ctx.guild.icon.url
+        )
+        embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar.url)
+        self.common_command_formatting(embed, command)
+        await ctx.send(embed=embed)
+
+    def common_command_formatting(
+        self, embed: discord.Embed, command: commands.Command
+    ):
+        embed.description = self.get_command_signature(command)
+        if command.description:
+            embed.description += (
+                f"```ansi\n{command.description}\n\n{command.help}\n```"
+            )
+        else:
+            embed.description += (
+                "```ansi\n" + command.help + "\n```" or "No help found..."
+            )
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, exc):
-        if isinstance(exc, discord.ext.commands.MessageNotFound):
+        if isinstance(exc, discord.ext.commands.MissingRequiredArgument):
+            await self.send_command_help(ctx, ctx.command)
+        elif isinstance(exc, discord.ext.commands.MessageNotFound):
             e = discord.Embed(
                 description=f" I couldn't find that message",
                 colour=discord.Colour.red(),
