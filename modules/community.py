@@ -22,7 +22,7 @@ async def get_info_embed(guild: discord.Guild, **kwargs) -> discord.Embed:
         "member_count": 1,
         "staff": [],
         "voice_chat": None,
-        "description": "No description provided..."
+        "description": "No description provided...",
     }
     kwargs = default_kwargs | kwargs
     staff_members = [
@@ -30,12 +30,12 @@ async def get_info_embed(guild: discord.Guild, **kwargs) -> discord.Embed:
     ]
     embed = discord.Embed(
         description=f"**Community Information**\n\n"
-                    f"Owner: <@{kwargs.get('owner_id')}> {str(guild.get_member(int(kwargs.pop('owner_id'))))}\n"
-                    f"Description: {kwargs.pop('description')}\n"
-                    f"Member Count: {kwargs.pop('member_count')}\n"
-                    f"Voice: {kwargs.pop('voice_chat')}\n"
-                    f"Created: <t:{kwargs.pop('creation')}>\n"
-                    f"\nStaff:\n{''.join(staff_members)}",
+        f"Owner: <@{kwargs.get('owner_id')}> {str(guild.get_member(int(kwargs.pop('owner_id'))))}\n"
+        f"Description: {kwargs.pop('description')}\n"
+        f"Member Count: {kwargs.pop('member_count')}\n"
+        f"Voice: {kwargs.pop('voice_chat')}\n"
+        f"Created: <t:{kwargs.pop('creation')}>\n"
+        f"\nStaff:\n{''.join(staff_members)}",
         color=discord.Colour.brand_green(),
         timestamp=discord.utils.utcnow(),
     )
@@ -61,36 +61,44 @@ class Community(commands.Cog):
     async def get_community_by_owner_id(self, discord_id: typing.Union[str, int]):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"owner_id": str(discord_id)})
+            .get_collection("communities")
+            .find_one({"owner_id": str(discord_id)})
         )
 
     async def get_community_by_channel_id(self, channel_id: typing.Union[str, int]):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"channel_id": str(channel_id)})
+            .get_collection("communities")
+            .find_one({"channel_id": str(channel_id)})
         )
 
     async def get_community_by_exact_name(self, name: str):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"name": str(name)})
+            .get_collection("communities")
+            .find_one({"name": str(name)})
         )
 
     async def get_community_by_id(self, community_id: str):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"_id": ObjectId(community_id)})
+            .get_collection("communities")
+            .find_one({"_id": ObjectId(community_id)})
         )
 
     async def get_community_somehow(
-            self, guild: discord.Guild, *, searchable: typing.Union[str, int]
+        self, guild: discord.Guild, *, searchable: typing.Union[str, int]
     ):
-        searchable = str(searchable).replace(" ", "").lower().replace("<", "").replace(">", "").replace("#", ""). \
-            replace("@", "").replace("!", "")
+        searchable = (
+            str(searchable)
+            .replace(" ", "")
+            .lower()
+            .replace("<", "")
+            .replace(">", "")
+            .replace("#", "")
+            .replace("@", "")
+            .replace("!", "")
+        )
         _type = None
         if len(str(searchable)) == 18:
             if guild.get_channel(int(searchable)):
@@ -118,7 +126,7 @@ class Community(commands.Cog):
         return None
 
     async def get_community_info(
-            self, guild: discord.Guild, search_by: typing.Union[str, int]
+        self, guild: discord.Guild, search_by: typing.Union[str, int]
     ) -> typing.Union[discord.Embed, None]:
         community = await self.get_community_somehow(guild, searchable=search_by)
         if not community:
@@ -131,7 +139,7 @@ class Community(commands.Cog):
             member_count=community["member_count"],
             staff=community["moderators"],
             voice_chat=community["voice_chat"],
-            description=community['description']
+            description=community["description"],
         )
 
     @commands.group(aliases=["c", "communities"], invoke_without_command=True)
@@ -139,8 +147,8 @@ class Community(commands.Cog):
         embed = discord.Embed(
             title="Community Help",
             description="Communities are text-channels relating to any topic! "
-                        "Run `help community <sub command>` to view the full"
-                        " command usage!\n\n",
+            "Run `help community <sub command>` to view the full"
+            " command usage!\n\n",
             color=discord.Colour.random(),
             timestamp=discord.utils.utcnow(),
         )
@@ -263,7 +271,7 @@ class Community(commands.Cog):
                 "voice_chat": None,
                 "banned_members": [],
                 "settings": {},
-                "description": f"{str(ctx.author)}'s awesome community!"
+                "description": f"{str(ctx.author)}'s awesome community!",
             }
         )
 
@@ -291,22 +299,42 @@ class Community(commands.Cog):
         """
         community = await self.get_community_somehow(ctx.guild, searchable=searchable)
         if not community:
-            return await ctx.send(embed=embeds.get_error_embed("A community wasn't found by that query!"))
-        if str(ctx.author.id) in community['banned_members']:
-            return await ctx.send(embed=embeds.get_error_embed(f"You are not permitted to join {community['name']}!"))
-        channel = ctx.guild.get_channel(int(community['channel_id']))
+            return await ctx.send(
+                embed=embeds.get_error_embed("A community wasn't found by that query!")
+            )
+        if str(ctx.author.id) in community["banned_members"]:
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"You are not permitted to join {community['name']}!"
+                )
+            )
+        channel = ctx.guild.get_channel(int(community["channel_id"]))
         overwrites = channel.overwrites
         if ctx.author in overwrites:
-            return await ctx.send(embed=embeds.get_error_embed(f"You've already joined <#{community['channel_id']}>!"))
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"You've already joined <#{community['channel_id']}>!"
+                )
+            )
 
         overwrites[ctx.author] = discord.PermissionOverwrite(read_messages=True)
         await channel.edit(overwrites=overwrites)
-        await ctx.send(embed=discord.Embed(description=f"Added you to {community['name']}!",
-                                           color=discord.Colour.green(), timestamp=discord.utils.utcnow()))
+        await ctx.send(
+            embed=discord.Embed(
+                description=f"Added you to {community['name']}!",
+                color=discord.Colour.green(),
+                timestamp=discord.utils.utcnow(),
+            )
+        )
 
     @community.command()
     @commands.cooldown(1, 20, BucketType.user)
-    async def leave(self, ctx: commands.Context, *, searchable: typing.Optional[typing.Union[str, int]]):
+    async def leave(
+        self,
+        ctx: commands.Context,
+        *,
+        searchable: typing.Optional[typing.Union[str, int]],
+    ):
         """
         Leave a community by running it in the channel or by using the owner ID, channel ID, or the name
         """
@@ -314,21 +342,40 @@ class Community(commands.Cog):
             searchable = str(ctx.channel.id)
         community = await self.get_community_somehow(ctx.guild, searchable=searchable)
         if not community:
-            return await ctx.send(embed=embeds.get_error_embed("A community wasn't found by that query!"))
-        if str(ctx.author.id) == community['owner_id']:
-            return await ctx.send(embed=embeds.get_error_embed("You can't leave a community you own!"))
-        channel = ctx.guild.get_channel(int(community['channel_id']))
+            return await ctx.send(
+                embed=embeds.get_error_embed("A community wasn't found by that query!")
+            )
+        if str(ctx.author.id) == community["owner_id"]:
+            return await ctx.send(
+                embed=embeds.get_error_embed("You can't leave a community you own!")
+            )
+        channel = ctx.guild.get_channel(int(community["channel_id"]))
         overwrites = channel.overwrites
         if ctx.author not in overwrites:
-            return await ctx.send(embed=embeds.get_error_embed(f"You're not in <#{community['channel_id']}>!"))
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"You're not in <#{community['channel_id']}>!"
+                )
+            )
 
-        await ctx.send(embed=discord.Embed(description=f"Removed you from {community['name']}!",
-                                           color=discord.Colour.green(), timestamp=discord.utils.utcnow()))
+        await ctx.send(
+            embed=discord.Embed(
+                description=f"Removed you from {community['name']}!",
+                color=discord.Colour.green(),
+                timestamp=discord.utils.utcnow(),
+            )
+        )
         await channel.set_permissions(ctx.author, overwrite=None)
 
     @community.command()
     @commands.cooldown(1, 20, BucketType.user)
-    async def add(self, ctx: commands.Context, members: commands.Greedy[discord.Member], *, searchable: typing.Union[str, int] = None):
+    async def add(
+        self,
+        ctx: commands.Context,
+        members: commands.Greedy[discord.Member],
+        *,
+        searchable: typing.Union[str, int] = None,
+    ):
         """
         Adds multiple members to your community.
 
@@ -344,14 +391,18 @@ class Community(commands.Cog):
             search_string = searchable
         else:
             search_string = ctx.author.id
-        community = await self.get_community_somehow(ctx.guild, searchable=search_string)
+        community = await self.get_community_somehow(
+            ctx.guild, searchable=search_string
+        )
         if not community:
-            return await ctx.send(embed=embeds.get_error_embed("You don't own a community!"))
+            return await ctx.send(
+                embed=embeds.get_error_embed("You don't own a community!")
+            )
 
     @admin.command()
     @commands.cooldown(1, 10, BucketType.default)
     async def find_raw(
-            self, ctx: commands.Context, *, searchable: typing.Union[str, int]
+        self, ctx: commands.Context, *, searchable: typing.Union[str, int]
     ):
         """
         Locate a community by a query. Dumps raw JSON, use `community admin find` instead.
@@ -385,7 +436,7 @@ class Community(commands.Cog):
         embed.description += f"\n\n**Staff Fields**\nCustom Settings: {json.dumps((community['settings']), indent=2)}\n"
         return await ctx.send(embed=embed)
 
-    @admin.command(aliases=['create'])
+    @admin.command(aliases=["create"])
     @commands.cooldown(1, 30, BucketType.default)
     async def admin_create(self, ctx: commands.Context, owner: discord.Member):
         """
@@ -424,7 +475,7 @@ class Community(commands.Cog):
                 "banned_members": [],
                 "settings": {},
                 "message_id": str(message.id),
-                "description": f"{str(owner)}'s awesome community."
+                "description": f"{str(owner)}'s awesome community.",
             }
         )
         self.__name_cache[str(ctx.channel.name)] = ctx.channel.id
@@ -437,7 +488,9 @@ class Community(commands.Cog):
 
     @admin.command()
     @commands.cooldown(1, 30, BucketType.default)
-    async def transfer(self, ctx: commands.Context, new_owner: discord.Member, *, query: str = None):
+    async def transfer(
+        self, ctx: commands.Context, new_owner: discord.Member, *, query: str = None
+    ):
         """
         Transfers a community to another user
         """
@@ -445,11 +498,20 @@ class Community(commands.Cog):
             query = ctx.channel.id
         community = await self.get_community_somehow(ctx.guild, searchable=str(query))
         if not community:
-            return await ctx.send(embed=embeds.get_error_embed("A community wasn't found with that query!"))
-        if community['owner_id'] == str(new_owner.id):
-            return await ctx.send(embed=embeds.get_error_embed(f"{new_owner.mention} already owns this community!"))
-        await self.col.delete_one({"_id": ObjectId(community['_id'])})
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    "A community wasn't found with that query!"
+                )
+            )
+        if community["owner_id"] == str(new_owner.id):
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"{new_owner.mention} already owns this community!"
+                )
+            )
+        await self.col.delete_one({"_id": ObjectId(community["_id"])})
         await self.admin_create(ctx, new_owner)
+
 
 async def setup(bot):
     await bot.add_cog(Community(bot))
