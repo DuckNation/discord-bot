@@ -1,16 +1,44 @@
 import asyncio
+import json
 import time
 import typing
-from inspect import Parameter
-from typing import Optional
 
-import pymongo
-from discord.ext import commands
 import discord
+import pymongo
+from bson import ObjectId
+from discord.ext import commands
 from discord.ext.commands import BucketType
 from pymongo.collection import Collection
+from pymongo.results import InsertOneResult
 
 from modules.utils import embeds
+
+
+async def get_info_embed(guild: discord.Guild, **kwargs) -> discord.Embed:
+    default_kwargs = {
+        "_id": None,
+        "owner_id": None,
+        "creation": int(time.time()),
+        "member_count": 1,
+        "staff": [],
+        "voice_chat": None,
+    }
+    kwargs = default_kwargs | kwargs
+    staff_members = [
+        "> " + str(guild.get_member(int(x))) + "\n" for x in kwargs.pop("staff")
+    ]
+    embed = discord.Embed(
+        description=f"**Community Information**\n\n"
+        f"Owner: <@{kwargs.get('owner_id')}> {str(guild.get_member(int(kwargs.pop('owner_id'))))}\n"
+        f"Member Count: {kwargs.pop('member_count')}\n"
+        f"Voice: {kwargs.pop('voice_chat')}\n"
+        f"Created: <t:{kwargs.pop('creation')}>\n"
+        f"\nStaff:\n{''.join(staff_members)}",
+        color=discord.Colour.brand_green(),
+        timestamp=discord.utils.utcnow(),
+    )
+    embed.set_footer(text=f"Community ID: {kwargs.pop('_id')}")
+    return embed
 
 
 class Community(commands.Cog):
@@ -28,14 +56,14 @@ class Community(commands.Cog):
             self.__name_cache[doc["name"]] = int(doc["channel_id"])
             # self.__name_cache[doc['channel_id']] = (doc['name'])
 
-    async def get_community_by_owner_id(self, discord_id: int):
+    async def get_community_by_owner_id(self, discord_id: typing.Union[str, int]):
         return (
             await self.db.get_database("duckServer")
             .get_collection("communities")
             .find_one({"owner_id": str(discord_id)})
         )
 
-    async def get_community_by_channel_id(self, channel_id: int):
+    async def get_community_by_channel_id(self, channel_id: typing.Union[str, int]):
         return (
             await self.db.get_database("duckServer")
             .get_collection("communities")
@@ -47,6 +75,58 @@ class Community(commands.Cog):
             await self.db.get_database("duckServer")
             .get_collection("communities")
             .find_one({"name": str(name)})
+        )
+
+    async def get_community_by_id(self, community_id: str):
+        return (
+            await self.db.get_database("duckServer")
+            .get_collection("communities")
+            .find_one({"_id": ObjectId(community_id)})
+        )
+
+    async def get_community_somehow(
+        self, guild: discord.Guild, *, searchable: typing.Union[str, int]
+    ):
+        _type = None
+        if len(str(searchable)) == 18:
+            if guild.get_channel(int(searchable)):
+                _type = "channel_id"
+            elif guild.get_member(int(searchable)):
+                _type = "owner_id"
+            else:
+                _type = None
+        elif len(str(searchable)) == 24:
+            _type = "community_id"
+        else:
+            _type = None
+
+        if _type:
+            if _type == "channel_id":
+                return await self.get_community_by_channel_id(searchable)
+            if _type == "owner_id":
+                return await self.get_community_by_owner_id(searchable)
+            if _type == "community_id":
+                return await self.get_community_by_id(searchable)
+        else:
+            return await self.get_community_by_exact_name(
+                searchable.replace(" ", "-").lower()
+            )
+        return None
+
+    async def get_community_info(
+        self, guild: discord.Guild, search_by: typing.Union[str, int]
+    ) -> typing.Union[discord.Embed, None]:
+        community = await self.get_community_somehow(guild, searchable=search_by)
+        if not community:
+            return None
+        return await get_info_embed(
+            guild,
+            _id=community["_id"],
+            owner_id=community["owner_id"],
+            creation=community["creation"],
+            member_count=community["member_count"],
+            staff=community["moderators"],
+            voice_chat=community["voice_chat"],
         )
 
     @commands.group(aliases=["c", "communities"], invoke_without_command=True)
@@ -75,6 +155,11 @@ class Community(commands.Cog):
             "🔺 **report**: Reports a community."
         )
         return await ctx.reply(embed=embed)
+
+    @community.group()
+    @commands.is_owner()
+    async def admin(self, ctx: commands.Context):
+        pass
 
     @community.command()
     @commands.cooldown(1, 60, BucketType.user)
@@ -157,12 +242,17 @@ class Community(commands.Cog):
             overwrites=overwrites,
             topic=f"{str(ctx.author)}'s awesome community.",
         )
-        await self.col.insert_one(
+        members = channel.members
+        real_members = [x for x in members if not x.bot]
+        channel_thing = await channel.send(content="holder")
+
+        a: InsertOneResult = await self.col.insert_one(
             {
                 "owner_id": str(ctx.author.id),
                 "channel_id": str(channel.id),
+                "message_id": str(channel_thing.id),
                 "creation": int(time.time()),
-                "member_count": 1,
+                "member_count": len(real_members),
                 "name": str(channel.name),
                 "moderators": [],
                 "voice_chat": None,
@@ -170,6 +260,11 @@ class Community(commands.Cog):
                 "settings": {},
             }
         )
+
+        e = await get_info_embed(
+            ctx.guild, owner_id=ctx.author.id, _id=a.inserted_id, staff=members
+        )
+        await channel_thing.edit(embed=e, content=None)
         self.__name_cache[str(channel.name)] = channel.id
         second = discord.Embed(
             description="Setting permissions...", color=discord.Colour.orange()
@@ -182,10 +277,45 @@ class Community(commands.Cog):
             f"{ctx.author.mention}, created your new community at {channel.mention}! <:duck_hearts:799084091809988618>"
         )
 
-    @community.command()
-    @commands.is_owner()  # todo refactor so its an admin command
-    # https://stackoverflow.com/questions/50548316/subcommands-in-python-bot
-    async def force_create(self, ctx: commands.Context, owner: discord.Member):
+    @admin.command()
+    @commands.cooldown(1, 10, BucketType.default)
+    async def find_raw(
+        self, ctx: commands.Context, *, searchable: typing.Union[str, int]
+    ):
+        """
+        Locate a community by a query. Dumps raw JSON, use `community admin find` instead.
+        """
+        community = await self.get_community_somehow(ctx.guild, searchable=searchable)
+        if community:
+            return await ctx.send(community)
+        return await ctx.send(
+            embed=embeds.get_error_embed(
+                f"A community wasn't found by the query of {searchable}"
+            )
+        )
+
+    @admin.command()
+    @commands.cooldown(1, 15, BucketType.default)
+    async def find(self, ctx: commands.Context, *, searchable: typing.Union[str, int]):
+        """
+        Locate a community by either a <name | owner_id | channel_id | community_id | voice_channel>
+
+        Shows extra information.
+        """
+        embed = await self.get_community_info(ctx.guild, search_by=searchable)
+        if not embed:
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    "A community wasn't found with that query!"
+                )
+            )
+        community = await self.get_community_somehow(ctx.guild, searchable=searchable)
+
+        embed.description += f"\n\n**Staff Fields**\nCustom Settings: {json.dumps((community['settings']), indent=2)}\n"
+        return await ctx.send(embed=embed)
+
+    @admin.command()
+    async def create(self, ctx: commands.Context, owner: discord.Member):
         """
         Force creates a community in the channel it's ran in with the owner.
 
@@ -205,8 +335,8 @@ class Community(commands.Cog):
         if exists:
             return await ctx.send(
                 embed=embeds.get_error_embed(
-                    f"This community already has an owner! <@{exists['owner_id']}> ({exists['owner_id']}). It was created"
-                    f" on <t:{exists['creation']}>"
+                    f"This community already has an owner! <@{exists['owner_id']}> ({exists['owner_id']}). It was "
+                    f"created on <t:{exists['creation']}>"
                 )
             )
         await self.col.insert_one(
