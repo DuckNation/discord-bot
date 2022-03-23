@@ -89,7 +89,7 @@ class Community(commands.Cog):
     async def get_community_somehow(
             self, guild: discord.Guild, *, searchable: typing.Union[str, int]
     ):
-        searchable = searchable.replace(" ", "").lower().replace("<", "").replace(">", "").replace("#", ""). \
+        searchable = str(searchable).replace(" ", "").lower().replace("<", "").replace(">", "").replace("#", ""). \
             replace("@", "").replace("!", "")
         _type = None
         if len(str(searchable)) == 18:
@@ -385,8 +385,9 @@ class Community(commands.Cog):
         embed.description += f"\n\n**Staff Fields**\nCustom Settings: {json.dumps((community['settings']), indent=2)}\n"
         return await ctx.send(embed=embed)
 
-    @admin.command()
-    async def create(self, ctx: commands.Context, owner: discord.Member):
+    @admin.command(aliases=['create'])
+    @commands.cooldown(1, 30, BucketType.default)
+    async def admin_create(self, ctx: commands.Context, owner: discord.Member):
         """
         Force creates a community in the channel it's ran in with the owner.
 
@@ -433,6 +434,21 @@ class Community(commands.Cog):
             )
         )
 
+    @admin.command()
+    @commands.cooldown(1, 30, BucketType.default)
+    async def transfer(self, ctx: commands.Context, new_owner: discord.Member, *, query: str = None):
+        """
+        Transfers a community to another user
+        """
+        if not query:
+            query = ctx.channel.id
+        community = await self.get_community_somehow(ctx.guild, searchable=str(query))
+        if not community:
+            return await ctx.send(embed=embeds.get_error_embed("A community wasn't found with that query!"))
+        if community['owner_id'] == str(new_owner.id):
+            return await ctx.send(embed=embeds.get_error_embed(f"{new_owner.mention} already owns this community!"))
+        await self.col.delete_one({"_id": ObjectId(community['_id'])})
+        await self.admin_create(ctx, new_owner)
 
 async def setup(bot):
     await bot.add_cog(Community(bot))
