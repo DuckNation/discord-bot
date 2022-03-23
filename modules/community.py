@@ -423,7 +423,8 @@ class Community(commands.Cog):
                 "voice_chat": None,
                 "banned_members": [],
                 "settings": {},
-                "message_id": str(message.id)
+                "message_id": str(message.id),
+                "description": f"{str(owner)}'s awesome community."
             }
         )
         self.__name_cache[str(ctx.channel.name)] = ctx.channel.id
