@@ -25,28 +25,28 @@ class Community(commands.Cog):
     @commands.Cog.listener(name="on_ready")
     async def populate_name_cache(self):
         async for doc in self.col.find():
-            self.__name_cache[doc['name']] = int(doc['channel_id'])
+            self.__name_cache[doc["name"]] = int(doc["channel_id"])
             # self.__name_cache[doc['channel_id']] = (doc['name'])
 
     async def get_community_by_owner_id(self, discord_id: int):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"owner_id": str(discord_id)})
+            .get_collection("communities")
+            .find_one({"owner_id": str(discord_id)})
         )
 
     async def get_community_by_channel_id(self, channel_id: int):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"channel_id": str(channel_id)})
+            .get_collection("communities")
+            .find_one({"channel_id": str(channel_id)})
         )
 
     async def get_community_by_exact_name(self, name: str):
         return (
             await self.db.get_database("duckServer")
-                .get_collection("communities")
-                .find_one({"name": str(name)})
+            .get_collection("communities")
+            .find_one({"name": str(name)})
         )
 
     @commands.group(aliases=["c", "communities"], invoke_without_command=True)
@@ -54,8 +54,8 @@ class Community(commands.Cog):
         embed = discord.Embed(
             title="Community Help",
             description="Communities are text-channels relating to any topic! "
-                        "Run `help community <sub command>` to view the full"
-                        " command usage!\n\n",
+            "Run `help community <sub command>` to view the full"
+            " command usage!\n\n",
             color=discord.Colour.random(),
             timestamp=discord.utils.utcnow(),
         )
@@ -107,8 +107,11 @@ class Community(commands.Cog):
             )
         exists = await self.get_community_by_exact_name(name.lower().replace(" ", "-"))
         if exists:
-            return await ctx.send(embed=embeds.get_error_embed(f"Another community by the name of `{name}` already "
-                                                               f"exists!"))
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"Another community by the name of `{name}` already " f"exists!"
+                )
+            )
         first = discord.Embed(
             description="Creating your channel...", color=discord.Colour.red()
         )
@@ -189,14 +192,23 @@ class Community(commands.Cog):
         This is only useful if a community was made by hand, and is owner-less
         """
         if ctx.channel.category_id != 887858173942308914:
-            return await ctx.send(embed=embeds.get_error_embed("This can't be ran here!"))
+            return await ctx.send(
+                embed=embeds.get_error_embed("This can't be ran here!")
+            )
         if owner.bot:
-            return await ctx.send(embed=embeds.get_error_embed(f"A bot can't be set as the community owner!"))
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"A bot can't be set as the community owner!"
+                )
+            )
         exists = await self.get_community_by_channel_id(ctx.channel.id)
         if exists:
-            return await ctx.send(embed=embeds.get_error_embed(
-                f"This community already has an owner! <@{exists['owner_id']}> ({exists['owner_id']}). It was created"
-                f" on <t:{exists['creation']}>"))
+            return await ctx.send(
+                embed=embeds.get_error_embed(
+                    f"This community already has an owner! <@{exists['owner_id']}> ({exists['owner_id']}). It was created"
+                    f" on <t:{exists['creation']}>"
+                )
+            )
         await self.col.insert_one(
             {
                 "owner_id": str(owner.id),
@@ -212,7 +224,11 @@ class Community(commands.Cog):
         )
         self.__name_cache[str(ctx.channel.name)] = ctx.channel.id
         await ctx.send(
-            embed=discord.Embed(description=f"{str(owner)} now owns this community.", color=discord.Colour.green()))
+            embed=discord.Embed(
+                description=f"{str(owner)} now owns this community.",
+                color=discord.Colour.green(),
+            )
+        )
 
 
 async def setup(bot):

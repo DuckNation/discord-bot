@@ -66,7 +66,7 @@ class Duck(commands.Bot):
     async def setup_hook(self) -> None:
         self.sqlite = await aiosqlite.connect("duck.db")
         self.db: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(
-            config['database-uri']
+            config["database-uri"]
         )
         self.session = aiohttp.ClientSession()
         for ext in _modules:
