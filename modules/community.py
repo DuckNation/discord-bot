@@ -326,7 +326,27 @@ class Community(commands.Cog):
                                            color=discord.Colour.green(), timestamp=discord.utils.utcnow()))
         await channel.set_permissions(ctx.author, overwrite=None)
 
+    @community.command()
+    @commands.cooldown(1, 20, BucketType.user)
+    async def add(self, ctx: commands.Context, members: commands.Greedy[discord.Member], *, searchable: typing.Union[str, int] = None):
+        """
+        Adds multiple members to your community.
 
+        Parameters:
+        members, channel
+
+        If a channel isn't specified, defaults to the channel it was executed in.
+
+        Example:
+        community add haappi haappiv2 haappiv3 genshin-impact
+        """
+        if searchable:
+            search_string = searchable
+        else:
+            search_string = ctx.author.id
+        community = await self.get_community_somehow(ctx.guild, searchable=search_string)
+        if not community:
+            return await ctx.send(embed=embeds.get_error_embed("You don't own a community!"))
 
     @admin.command()
     @commands.cooldown(1, 10, BucketType.default)
@@ -390,6 +410,7 @@ class Community(commands.Cog):
                     f"created on <t:{exists['creation']}>"
                 )
             )
+        message = await ctx.send("a")
         await self.col.insert_one(
             {
                 "owner_id": str(owner.id),
@@ -401,6 +422,7 @@ class Community(commands.Cog):
                 "voice_chat": None,
                 "banned_members": [],
                 "settings": {},
+                "message_id": str(message.id)
             }
         )
         self.__name_cache[str(ctx.channel.name)] = ctx.channel.id
