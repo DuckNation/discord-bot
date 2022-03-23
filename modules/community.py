@@ -169,7 +169,6 @@ class Community(commands.Cog):
                 "banned_members": [],
                 "settings": {},
             }
-
         )
         self.__name_cache[str(channel.name)] = channel.id
         second = discord.Embed(
