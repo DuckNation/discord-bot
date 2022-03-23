@@ -1,14 +1,6 @@
 name: Lint
 
-on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [pull_request, push]
 
 jobs:
   run-linters:
@@ -30,5 +22,5 @@ jobs:
       - name: Run linters
         uses: wearerequired/lint-action@v1
         with:
-          auto_fix: ${{ github.event_name == 'pull_request' }}
+          auto_fix: true
           black: true
