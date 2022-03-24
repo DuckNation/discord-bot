@@ -249,9 +249,12 @@ class Community(commands.Cog):
                 read_messages=True, manage_messages=True, manage_webhooks=True
             ),  # nqn
             ctx.guild.get_role(926905864701493258): discord.PermissionOverwrite(
-                send_message=False, add_reactions=False, create_public_threads=False, create_private_threads=False,
-                send_messages_in_threads=False
-            )  # muted
+                send_message=False,
+                add_reactions=False,
+                create_public_threads=False,
+                create_private_threads=False,
+                send_messages_in_threads=False,
+            ),  # muted
         }
         message = await ctx.send(embed=first)
         channel = await ctx.guild.get_channel(887858173942308914).create_text_channel(
@@ -422,7 +425,12 @@ class Community(commands.Cog):
 
     @admin.command()
     @commands.cooldown(1, 15, BucketType.default)
-    async def find(self, ctx: commands.Context, *, searchable: typing.Optional[typing.Union[str, int]]):
+    async def find(
+        self,
+        ctx: commands.Context,
+        *,
+        searchable: typing.Optional[typing.Union[str, int]],
+    ):
         """
         Locate a community by either a <name | owner_id | channel_id | community_id | voice_channel>
 
