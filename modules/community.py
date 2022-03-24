@@ -422,12 +422,14 @@ class Community(commands.Cog):
 
     @admin.command()
     @commands.cooldown(1, 15, BucketType.default)
-    async def find(self, ctx: commands.Context, *, searchable: typing.Union[str, int]):
+    async def find(self, ctx: commands.Context, *, searchable: typing.Optional[typing.Union[str, int]]):
         """
         Locate a community by either a <name | owner_id | channel_id | community_id | voice_channel>
 
-        Shows extra information.
+        Shows extra information. Recommended not to run in public channels
         """
+        if not searchable:
+            searchable = ctx.channel.id
         embed = await self.get_community_info(ctx.guild, search_by=searchable)
         if not embed:
             return await ctx.send(
