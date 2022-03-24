@@ -232,7 +232,7 @@ class Community(commands.Cog):
             ),  # staff team
             ctx.author: discord.PermissionOverwrite(
                 read_messages=True, manage_messages=True, manage_threads=True
-            ),
+            ),  # owner
             ctx.guild.get_member(339254240012664832): discord.PermissionOverwrite(
                 read_messages=True
             ),  # amari
@@ -248,6 +248,9 @@ class Community(commands.Cog):
             ctx.guild.get_member(559426966151757824): discord.PermissionOverwrite(
                 read_messages=True, manage_messages=True, manage_webhooks=True
             ),  # nqn
+            ctx.guild.get_role(926905864701493258): discord.PermissionOverwrite(
+                send_message=False, add_reactions=False
+            )  # muted
         }
         message = await ctx.send(embed=first)
         channel = await ctx.guild.get_channel(887858173942308914).create_text_channel(
