@@ -25,6 +25,7 @@ class ChatEvents(commands.Cog):
 
     @tasks.loop(hours=1)
     async def unokay(self):
+        self.failed_attempts = {}
         a: aiosqlite.Cursor = await self.sqlite.cursor()
         this = await a.execute(
             "SELECT victim FROM removeok WHERE unix <= ?", (str(int(time.time())),)
