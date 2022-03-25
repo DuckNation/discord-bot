@@ -66,7 +66,7 @@ class ChatEvents(commands.Cog):
             await a.execute(
                 "INSERT INTO removeok(victim, unix) VALUES (?, ?)",
                 (str(message.author.id), str(int(time.time()) + 86400)),
-            )  # 2 days
+            )  # 1 day
             await self.sqlite.commit()
             await a.close()
 
