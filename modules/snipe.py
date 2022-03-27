@@ -23,7 +23,8 @@ def use_snipe():
             utils.get(ctx.author.roles, id=888578948445900831)
             or utils.get(ctx.author.roles, id=888106876854763560)
             or ctx.author.guild_permissions.administrator
-            or ctx.author.id == 713865980526329887
+            or ctx.author.id == 713865980526329887  # shoe
+            or ctx.author.id == 821647232801570866
         )
 
     return commands.check(predicate)
