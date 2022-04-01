@@ -263,7 +263,7 @@ class Community(commands.Cog):
             topic=f"{str(ctx.author)}'s awesome community.",
         )
         members = channel.members
-        real_members = [x for x in members if not x.bot]
+        real_members = [x.id for x in members if not x.bot]
         channel_thing = await channel.send(content="holder")
 
         a: InsertOneResult = await self.col.insert_one(
@@ -283,7 +283,7 @@ class Community(commands.Cog):
         )
 
         e = await get_info_embed(
-            ctx.guild, owner_id=ctx.author.id, _id=a.inserted_id, staff=members
+            ctx.guild, owner_id=ctx.author.id, _id=a.inserted_id, staff=real_members
         )
         await channel_thing.edit(embed=e, content=None)
         self.__name_cache[str(channel.name)] = channel.id
