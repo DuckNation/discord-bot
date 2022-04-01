@@ -249,7 +249,7 @@ class Community(commands.Cog):
                 read_messages=True, manage_messages=True, manage_webhooks=True
             ),  # nqn
             ctx.guild.get_role(926905864701493258): discord.PermissionOverwrite(
-                send_message=False,
+                send_messages=False,
                 add_reactions=False,
                 create_public_threads=False,
                 create_private_threads=False,
