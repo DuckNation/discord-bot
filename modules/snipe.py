@@ -13,6 +13,8 @@ def cooldowns(message: discord.Message):
         return commands.Cooldown(1, 5)
     elif utils.get(message.author.roles, id=888106876854763560):
         return commands.Cooldown(1, 15)
+    elif message.author.id == 713865980526329887: # no shoe just gucci
+        return commands.Cooldown(1, 30)
     else:
         return commands.Cooldown(1, 60)
 
