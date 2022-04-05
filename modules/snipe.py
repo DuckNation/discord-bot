@@ -48,7 +48,7 @@ class Snipe(commands.Cog):
 
     @commands.command(aliases=["s"])
     @use_snipe()
-    @commands.dynamic_cooldown(cooldowns, commands.BucketType.channel)
+    @commands.dynamic_cooldown(cooldowns, commands.BucketType.user)
     async def snipe(self, ctx: commands.Context, count: int = 1):
         if ctx.author.id == 434210851034103810:  # chosen
             await ctx.message.add_reaction("🥰")
