@@ -95,8 +95,7 @@ class ErrorHandler(commands.Cog):
         elif isinstance(exc, discord.ext.commands.errors.BadArgument):
             return await ctx.send(
                 embed=discord.Embed(
-                    description="You sent a bad argument. Did you mean to view the "
-                    "help page to view the correct command usage sMh?"
+                    description=f"{exc.args[0]}", colour=discord.Colour.red()
                 )
             )
         elif isinstance(exc, discord.ext.commands.errors.CommandNotFound):
