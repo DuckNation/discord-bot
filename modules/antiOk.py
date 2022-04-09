@@ -46,8 +46,9 @@ class ChatEvents(commands.Cog):
     async def on_okay(self, message: discord.Message):
         if message.channel.id != 834581735642628147:
             return
-        if message.content != "ok":
-            await message.delete()
+        if message.content == "ok":
+            return
+        await message.delete()
         try:
             if not self.failed_attempts[message.author.id]:
                 self.failed_attempts[message.author.id] = 0
