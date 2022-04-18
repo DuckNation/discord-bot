@@ -62,6 +62,8 @@ class Snipe(commands.Cog):
         messages: list = self.messages[ctx.channel.id]
         messages.reverse()
         if count > len(messages):
+            if ctx.author.id == 578006934507094016:
+                return await ctx.send(len(messages)
             return await ctx.send("That snipe number is too high!", delete_after=5)
         message = self.messages[ctx.channel.id][count - 1].split("ß")
         embed = discord.Embed(
@@ -87,6 +89,8 @@ class Snipe(commands.Cog):
         messages: list = self.edited[ctx.channel.id]
         messages.reverse()
         if count > len(messages):
+            if ctx.author.id == 578006934507094016:
+                return await ctx.send(len(messages)
             return await ctx.send("That snipe number is too high!", delete_after=5)
         message = self.edited[ctx.channel.id][count - 1].split("ß")
         embed = discord.Embed(
