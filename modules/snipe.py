@@ -104,6 +104,7 @@ class Snipe(commands.Cog):
     async def on_message_delete(self, message: discord.Message):
         if message.author.bot:
             return
+        if message.content == "ok": return
         try:
             if not self.messages[message.channel.id]:
                 self.messages[message.channel.id] = []
