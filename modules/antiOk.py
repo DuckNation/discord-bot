@@ -41,7 +41,10 @@ class ChatEvents(commands.Cog):
                 await a.execute("DELETE FROM removeok WHERE victim = ?", (thing[0],))
                 await self.sqlite.commit()
         await a.close()
-
+    @commands.Cog.listener(name="on_message})
+    async def shoe_is_gay(self, message: discord.Message):
+        if message.author.id not in (713865980526329887, 821647232801570866): return
+        if message.content == "ok": await message.delete()
     @commands.Cog.listener(name="on_message")
     async def on_okay(self, message: discord.Message):
         if message.channel.id != 834581735642628147:
