@@ -169,7 +169,7 @@ class Community(commands.Cog):
         )
         return await ctx.reply(embed=embed)
 
-    @community.group()
+    @community.group(aliases=["a"])
     @commands.is_owner()
     async def admin(self, ctx: commands.Context):
         pass
