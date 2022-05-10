@@ -5,6 +5,7 @@ from discord import utils
 from discord.ext import commands, tasks
 import discord
 
+cant = ("ok", "nigg", "fag")
 
 def cooldowns(message: discord.Message):
     if utils.get(message.author.roles, id=887547454885601350):
@@ -104,7 +105,7 @@ class Snipe(commands.Cog):
     async def on_message_delete(self, message: discord.Message):
         if message.author.bot:
             return
-        if message.content == "ok": return
+        if message.content.lower() in cant: return
         try:
             if not self.messages[message.channel.id]:
                 self.messages[message.channel.id] = []
