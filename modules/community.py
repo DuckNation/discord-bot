@@ -157,7 +157,7 @@ class Community(commands.Cog):
             "Available subcommands-\n\n"
             "**create**: Creates a community.\n"
             "**edit**: Edit aspects of your community.\n"
-            "**add**: Add someone to your community."
+            "**add**: Add someone to your community.\n"
             "**list**: List all joinable communities.\n"
             "**join**: Join a community.\n"
             "**leave**: Leave a community,\n"
