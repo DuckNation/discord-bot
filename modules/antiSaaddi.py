@@ -12,6 +12,14 @@ class AntiSaaddi(commands.Cog):
             return
         if "saaddi" in message.content.lower():
             await message.delete()
+        if "Im back bitches" in message.content.lower():
+            await message.delete()
+        if message.embeds:
+            for embed in message.embeds:
+                if "saaddi" in embed.description.lower():
+                    await message.delete()
+                    break
+
 
 
 async def setup(bot):
