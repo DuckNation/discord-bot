@@ -10,7 +10,7 @@ class AntiSaaddi(commands.Cog):
     async def on_message(self, message: discord.Message):
         if not message.author.bot:
             return
-        if 'saaddi' in message.content.lower():
+        if "saaddi" in message.content.lower():
             await message.delete()
 
 
