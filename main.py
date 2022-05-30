@@ -30,6 +30,7 @@ _modules = (
     "modules.antiabuse",
     "jishaku",
     "modules.community",
+    "modules.antiSaaddi",
     # "modules.dynamicTime",
 )
 
