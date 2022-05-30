@@ -169,7 +169,7 @@ class Community(commands.Cog):
         )
         return await ctx.reply(embed=embed)
 
-    @community.group()
+    @community.group(aliases=["a"])
     @commands.is_owner()
     async def admin(self, ctx: commands.Context):
         pass
@@ -297,6 +297,11 @@ class Community(commands.Cog):
         await ctx.send(
             f"{ctx.author.mention}, created your new community at {channel.mention}! <:duck_hearts:799084091809988618>"
         )
+    
+    @community.command(name="info")
+    @commands.cooldown(1, 20, BucketType.user)
+    async def _info(self, ctx: commands.Context, *, searchable: typing.Union[str, int]):
+        await self.find(ctx, searchable)
 
     @community.command()
     @commands.cooldown(1, 20, BucketType.user)

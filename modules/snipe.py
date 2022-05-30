@@ -5,6 +5,7 @@ from discord import utils
 from discord.ext import commands, tasks
 import discord
 
+cant = ("ok", "nigg", "fag")
 
 def cooldowns(message: discord.Message):
     if utils.get(message.author.roles, id=887547454885601350):
@@ -62,6 +63,7 @@ class Snipe(commands.Cog):
         messages: list = self.messages[ctx.channel.id]
         messages.reverse()
         if count > len(messages):
+            # if ctx.author.id == 578006934507094016: return await ctx.send(len(messages)
             return await ctx.send("That snipe number is too high!", delete_after=5)
         message = self.messages[ctx.channel.id][count - 1].split("ß")
         embed = discord.Embed(
@@ -87,6 +89,7 @@ class Snipe(commands.Cog):
         messages: list = self.edited[ctx.channel.id]
         messages.reverse()
         if count > len(messages):
+            # if ctx.author.id == 578006934507094016: return await ctx.send(len(messages)
             return await ctx.send("That snipe number is too high!", delete_after=5)
         message = self.edited[ctx.channel.id][count - 1].split("ß")
         embed = discord.Embed(
@@ -102,6 +105,7 @@ class Snipe(commands.Cog):
     async def on_message_delete(self, message: discord.Message):
         if message.author.bot:
             return
+        if message.content.lower() in cant: return
         try:
             if not self.messages[message.channel.id]:
                 self.messages[message.channel.id] = []
