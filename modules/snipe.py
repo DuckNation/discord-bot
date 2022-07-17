@@ -15,8 +15,8 @@ def cooldowns(message: discord.Message):
         return commands.Cooldown(1, 5)
     elif utils.get(message.author.roles, id=888106876854763560):
         return commands.Cooldown(1, 15)
-    elif message.author.id == 713865980526329887:  # no shoe just gucci
-        return commands.Cooldown(1, 30)
+#     elif message.author.id == 713865980526329887:  # no shoe just gucci
+#         return commands.Cooldown(1, 30)
     else:
         return commands.Cooldown(1, 60)
 
@@ -27,8 +27,8 @@ def use_snipe():
             utils.get(ctx.author.roles, id=888578948445900831)
             or utils.get(ctx.author.roles, id=888106876854763560)
             or ctx.author.guild_permissions.administrator
-            or ctx.author.id == 713865980526329887  # shoe
-            or ctx.author.id == 821647232801570866
+            or ctx.author.id == 578006934507094016  # Juno
+            or ctx.author.id == 903611946543251457  # Adj
         )
 
     return commands.check(predicate)
