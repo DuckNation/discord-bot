@@ -31,6 +31,7 @@ _modules = (
     "jishaku",
     "modules.community",
     "modules.antiSaaddi",
+    "modules.smp_file",
     # "modules.dynamicTime",
 )
 
