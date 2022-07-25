@@ -32,7 +32,7 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
             elif doc["type"] == "chat":
                 pass
             else:
-                await bot.get_channel(1001007612923490304).send(doc)
+                await webhook.send(doc)
         await asyncio.sleep(1)
 
 
