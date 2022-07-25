@@ -11,6 +11,10 @@ from pymongo.cursor import Cursor
 
 async def pain(cursor: Cursor, bot: commands.Bot) -> None:
     await bot.wait_until_ready()
+    webhook: discord.Webhook = discord.Webhook.from_url(
+        'https://discord.com/api/webhooks/1001049412618960898/eCLINqRkVVaHf38uULFi9GFNXT2Uoqcf22073mjrA2Uxb1wctDmXp2m-_OQvqGTPSTyp',
+        session=bot.session)
+
     while cursor.alive:
         async for doc in cursor:  # noqa
             if doc["bound"] != "clientbound":
@@ -18,11 +22,12 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
             del doc["file"]
             if doc["type"] == "config":
                 print(doc)
-                await bot.get_channel(1001007612923490304).send(
+                await webhook.send(
                     doc["message"],
                     embed=discord.Embed(
                         description=json.dumps(doc["returned"], indent=4)
                     ),
+                    allowed_mentions=discord.AllowedMentions(everyone=False, users=True, roles=False),
                 )
             elif doc["type"] == "chat":
                 pass
@@ -34,8 +39,8 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
 def use_files():
     def predicate(ctx: commands.Context):
         return (
-            ctx.author.guild_permissions.administrator
-            or ctx.author.id == 851127222629957672  # Juno
+                ctx.author.guild_permissions.administrator
+                or ctx.author.id == 851127222629957672  # Juno
         )
 
     return commands.check(predicate)
