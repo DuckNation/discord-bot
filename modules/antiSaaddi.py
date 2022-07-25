@@ -16,7 +16,10 @@ class AntiSaaddi(commands.Cog):
             await message.delete()
         if message.embeds:
             for embed in message.embeds:
-                if "saaddi" in embed.description.lower() or "saaddi" in embed.title.lower():
+                if (
+                    "saaddi" in embed.description.lower()
+                    or "saaddi" in embed.title.lower()
+                ):
                     await message.delete()
                     break
 

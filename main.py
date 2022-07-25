@@ -30,7 +30,7 @@ _modules = (
     "modules.antiabuse",
     "jishaku",
     "modules.community",
-    "modules.antiSaaddi",
+    # "modules.antiSaaddi",
     "modules.smp_file",
     # "modules.dynamicTime",
 )
