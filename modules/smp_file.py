@@ -70,9 +70,11 @@ class SMPFile(commands.Cog):
         if not ctx.message.attachments:
             return await ctx.send("No attachments found!")
 
-        # if the filename doesn't end in .yml
-        if not ctx.message.attachments[0].filename.endswith(".yml"):
-            return await ctx.send("Invalid file type! Must be a .yml file.")
+        if not ctx.message.attachments[0].filename.endswith(".yml") or \
+                not ctx.message.attachments[0].filename.endswith(".yaml") or \
+                not ctx.message.attachments[0].filename.endswith(".properties") or \
+                not ctx.message.attachments[0].filename.endswith(".json"):
+            return await ctx.send("Invalid file type! Must be either a `.yml`, `.properties` or `.json` file.")
 
         attach = await ctx.message.attachments[0].read()
         await self.collection.insert_one(
