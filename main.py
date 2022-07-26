@@ -1,24 +1,12 @@
-import asyncio
-import dis
-import sys
-import traceback
-from typing import Literal
+import json
 
 import aiohttp
 import aiosqlite
-import discord.ext
 import discord
-
-import logging
-import os
-import time
-import json
-
-from discord import app_commands
-from discord.ext import commands
-from discord.ext.commands import context
+import discord.ext
 import motor.motor_asyncio
 import pymongo
+from discord.ext import commands
 
 config = json.load(open("config.json"))
 

@@ -3,7 +3,6 @@ import json
 
 import discord
 import pymongo
-from discord import utils
 from discord.ext import commands
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor

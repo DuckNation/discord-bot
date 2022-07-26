@@ -1,20 +1,19 @@
 import asyncio
+import json
+import logging
+import os
 import sys
+import time
 import traceback
 
 import aiohttp
 import aiosqlite
-import discord.ext
 import discord
-
-import logging
-import os
-import time
-import json
-from discord.ext import commands
-from discord.ext.commands import context
+import discord.ext
 import motor.motor_asyncio
 import pymongo
+from discord.ext import commands
+from discord.ext.commands import context
 
 inital_cogs = (
     "jishaku",

@@ -1,9 +1,9 @@
 import datetime
 import time
 
+import discord
 from discord import utils
 from discord.ext import commands, tasks
-import discord
 
 cant = ("ok", "nigg", "fag")
 

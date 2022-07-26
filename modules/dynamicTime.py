@@ -2,9 +2,9 @@ import asyncio
 from datetime import datetime
 
 import aiosqlite
+import discord
 import pytz
 from discord.ext import commands
-import discord
 
 from modules.utils import time
 

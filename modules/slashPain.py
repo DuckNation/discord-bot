@@ -1,8 +1,6 @@
-from typing import Literal
-
+import discord
 from discord import app_commands
 from discord.ext import commands
-import discord
 
 
 class SlashPain(commands.Cog):

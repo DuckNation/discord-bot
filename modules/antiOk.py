@@ -1,11 +1,7 @@
-import asyncio
-import sqlite3
 import time
 
-import aiohttp
 import aiosqlite
 import discord
-import pymongo
 from discord.ext import commands, tasks
 
 

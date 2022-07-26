@@ -1,8 +1,4 @@
-from typing import Optional
-
 from discord.ext import commands
-import discord
-from discord.ext.commands import has_permissions
 
 
 class AutoSlowmode(commands.Cog):
