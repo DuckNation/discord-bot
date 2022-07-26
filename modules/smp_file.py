@@ -74,9 +74,9 @@ class SMPFile(commands.Cog):
 
         if (
             not ctx.message.attachments[0].filename.endswith(".yml")
-            or not ctx.message.attachments[0].filename.endswith(".yaml")
-            or not ctx.message.attachments[0].filename.endswith(".properties")
-            or not ctx.message.attachments[0].filename.endswith(".json")
+            # or not ctx.message.attachments[0].filename.endswith(".yaml")
+            # or not ctx.message.attachments[0].filename.endswith(".properties")
+            # or not ctx.message.attachments[0].filename.endswith(".json")
         ):
             return await ctx.send(
                 "Invalid file type! Must be either a `.yml`, `.properties` or `.json` file."
