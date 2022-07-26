@@ -12,8 +12,9 @@ from pymongo.cursor import Cursor
 async def pain(cursor: Cursor, bot: commands.Bot) -> None:
     await bot.wait_until_ready()
     webhook: discord.Webhook = discord.Webhook.from_url(
-        'https://discord.com/api/webhooks/1001049412618960898/eCLINqRkVVaHf38uULFi9GFNXT2Uoqcf22073mjrA2Uxb1wctDmXp2m-_OQvqGTPSTyp',
-        session=bot.session)
+        "https://discord.com/api/webhooks/1001049412618960898/eCLINqRkVVaHf38uULFi9GFNXT2Uoqcf22073mjrA2Uxb1wctDmXp2m-_OQvqGTPSTyp",
+        session=bot.session,
+    )
 
     while cursor.alive:
         async for doc in cursor:  # noqa
@@ -27,7 +28,9 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
                     embed=discord.Embed(
                         description=json.dumps(doc["returned"], indent=4)
                     ),
-                    allowed_mentions=discord.AllowedMentions(everyone=False, users=True, roles=False),
+                    allowed_mentions=discord.AllowedMentions(
+                        everyone=False, users=True, roles=False
+                    ),
                 )
             elif doc["type"] == "chat":
                 pass
@@ -39,8 +42,8 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
 def use_files():
     def predicate(ctx: commands.Context):
         return (
-                ctx.author.guild_permissions.administrator
-                or ctx.author.id == 851127222629957672  # Juno
+            ctx.author.guild_permissions.administrator
+            or ctx.author.id == 851127222629957672  # Juno
         )
 
     return commands.check(predicate)
@@ -70,11 +73,15 @@ class SMPFile(commands.Cog):
         if not ctx.message.attachments:
             return await ctx.send("No attachments found!")
 
-        if not ctx.message.attachments[0].filename.endswith(".yml") or \
-                not ctx.message.attachments[0].filename.endswith(".yaml") or \
-                not ctx.message.attachments[0].filename.endswith(".properties") or \
-                not ctx.message.attachments[0].filename.endswith(".json"):
-            return await ctx.send("Invalid file type! Must be either a `.yml`, `.properties` or `.json` file.")
+        if (
+            not ctx.message.attachments[0].filename.endswith(".yml")
+            or not ctx.message.attachments[0].filename.endswith(".yaml")
+            or not ctx.message.attachments[0].filename.endswith(".properties")
+            or not ctx.message.attachments[0].filename.endswith(".json")
+        ):
+            return await ctx.send(
+                "Invalid file type! Must be either a `.yml`, `.properties` or `.json` file."
+            )
 
         attach = await ctx.message.attachments[0].read()
         await self.collection.insert_one(
