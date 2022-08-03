@@ -20,6 +20,7 @@ _modules = (
     "modules.community",
     # "modules.antiSaaddi",
     "modules.smp_file",
+    "modules.inGameLinking",
     # "modules.dynamicTime",
 )
 
