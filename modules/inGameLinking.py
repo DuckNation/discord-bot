@@ -1,3 +1,5 @@
+import uuid
+
 import pymongo
 from discord.ext import commands
 import discord
@@ -38,7 +40,7 @@ class InGameLinking(commands.Cog):
             {
                 "type": "discord_update",
                 "bound": "serverbound",
-                "uuid": document['_id'],
+                "uuid": str(uuid.UUID(hex=str(document['_id']))),
                 "message": "<aqua>You have been linked the account <yellow>{}<aqua>!".format(document['playerName']),
             }
         )
