@@ -11,7 +11,7 @@ from pymongo.cursor import Cursor
 async def pain(cursor: Cursor, bot: commands.Bot) -> None:
     await bot.wait_until_ready()
     webhook: discord.Webhook = discord.Webhook.from_url(
-        "https://discord.com/api/webhooks/1001049412618960898/eCLINqRkVVaHf38uULFi9GFNXT2Uoqcf22073mjrA2Uxb1wctDmXp2m-_OQvqGTPSTyp",
+        "https://discord.com/api/webhooks/1006624911990718464/PT8h7zGxQcd5HDz2CN6LX6ZmJn69aO9W8ci0UgaYdvgW6XeLWbXxoWPMmzM7h5lwuTpB",
         session=bot.session,
     )
 
