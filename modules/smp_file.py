@@ -19,7 +19,7 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
         async for doc in cursor:  # noqa
             if doc["bound"] != "clientbound":
                 continue
-            if doc['ack']:
+            if 'ack' in doc and doc['ack'] == 1:
                 continue
             if doc["type"] == "config":
                 del doc["file"]
@@ -37,16 +37,16 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
             elif doc["type"] == "change_mob":
                 channel: discord.TextChannel = bot.get_channel(927300714508730418)
                 embed: discord.Embed = discord.Embed(
-                    description=f"Current Totem Mob: {doc['mobName']}"
+                    description=f"Current Totem Mob: **{doc['mobName']}**", colour=discord.Colour.random(),
+                    timestamp=discord.utils.utcnow(),
                 )
                 await bot.get_channel(927300714508730418).get_partial_message(1006353427862917222).edit(
                     embed=embed,
-                    content=None
+                    content=None,
                 )
                 await channel.send(doc['message'])
 
-                doc['ack'] = True
-                await bot.db.duckMinecraft.messages.update_one(doc)
+                await bot.db.duckMinecraft.messages.update_one(doc, {"$set": {'ack': 1}})
             else:
                 await webhook.send(doc)
         await asyncio.sleep(1)
@@ -55,8 +55,8 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
 def use_files():
     def predicate(ctx: commands.Context):
         return (
-            ctx.author.guild_permissions.administrator
-            or ctx.author.id == 851127222629957672  # Juno
+                ctx.author.guild_permissions.administrator
+                or ctx.author.id == 851127222629957672  # Juno
         )
 
     return commands.check(predicate)
@@ -87,10 +87,10 @@ class SMPFile(commands.Cog):
             return await ctx.send("No attachments found!")
 
         if (
-            not ctx.message.attachments[0].filename.endswith(".yml")
-            # or not ctx.message.attachments[0].filename.endswith(".yaml")
-            # or not ctx.message.attachments[0].filename.endswith(".properties")
-            # or not ctx.message.attachments[0].filename.endswith(".json")
+                not ctx.message.attachments[0].filename.endswith(".yml")
+                # or not ctx.message.attachments[0].filename.endswith(".yaml")
+                # or not ctx.message.attachments[0].filename.endswith(".properties")
+                # or not ctx.message.attachments[0].filename.endswith(".json")
         ):
             return await ctx.send(
                 "Invalid file type! Must be either a `.yml`, `.properties` or `.json` file."
