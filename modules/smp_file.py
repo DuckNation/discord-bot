@@ -19,6 +19,8 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
         async for doc in cursor:  # noqa
             if doc["bound"] != "clientbound":
                 continue
+            if doc['ack']:
+                continue
             if doc["type"] == "config":
                 del doc["file"]
                 await webhook.send(
@@ -42,6 +44,9 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
                     content=None
                 )
                 await channel.send(doc['message'])
+
+                doc['ack'] = True
+                await bot.db.duckMinecraft.messages.update_one(doc)
             else:
                 await webhook.send(doc)
         await asyncio.sleep(1)
