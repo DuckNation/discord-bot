@@ -33,6 +33,15 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
                 )
             elif doc["type"] == "chat":
                 pass
+            elif doc["type"] == "change_mob":
+                channel: discord.TextChannel = bot.get_channel(927300714508730418)
+                embed: discord.Embed = discord.Embed(
+                    description=f"Current Totem Mob: {doc['mobName']}"
+                )
+                await bot.get_channel(927300714508730418).get_partial_message(1006353427862917222).edit(
+                    embed=embed
+                )
+                await channel.send(doc['message'])
             else:
                 await webhook.send(doc)
         await asyncio.sleep(1)
