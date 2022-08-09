@@ -19,9 +19,8 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
         async for doc in cursor:  # noqa
             if doc["bound"] != "clientbound":
                 continue
-            del doc["file"]
             if doc["type"] == "config":
-                print(doc)
+                del doc["file"]
                 await webhook.send(
                     doc["message"],
                     embed=discord.Embed(
