@@ -38,7 +38,8 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
                     description=f"Current Totem Mob: {doc['mobName']}"
                 )
                 await bot.get_channel(927300714508730418).get_partial_message(1006353427862917222).edit(
-                    embed=embed
+                    embed=embed,
+                    content=None
                 )
                 await channel.send(doc['message'])
             else:
