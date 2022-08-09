@@ -40,13 +40,14 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
                     description=f"Current Totem Mob: **{doc['mobName']}**", colour=discord.Colour.random(),
                     timestamp=discord.utils.utcnow(),
                 )
+                embed.set_footer(text="Last Updated at: ")
                 await bot.get_channel(927300714508730418).get_partial_message(1006353427862917222).edit(
                     embed=embed,
                     content=None,
                 )
                 await channel.send(doc['message'])
 
-                await bot.db.duckMinecraft.messages.update_one(doc, {"$set": {'ack': 1}})
+                await bot.db.duckMinecraft.messages.update_one(doc, {"$set": {'ack': 1}}) # documents must be the same size.
             else:
                 await webhook.send(doc)
         await asyncio.sleep(1)
