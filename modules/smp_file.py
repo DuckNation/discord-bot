@@ -5,11 +5,16 @@ import discord
 import pymongo
 from discord.ext import commands
 from pymongo.collection import Collection
-from pymongo.cursor import Cursor
+
+from main import Duck
+from modules.mongoUtils import handle_change_mob, handle_config_upload
 
 
-async def pain(cursor: Cursor, bot: commands.Bot) -> None:
+async def pain(collection: Collection, bot: Duck) -> None:
     await bot.wait_until_ready()
+    cursor = collection.find(
+        (), cursor_type=pymongo.CursorType.TAILABLE_AWAIT, oplog_replay=True
+    )
     webhook: discord.Webhook = discord.Webhook.from_url(
         "https://discord.com/api/webhooks/1006624911990718464/PT8h7zGxQcd5HDz2CN6LX6ZmJn69aO9W8ci0UgaYdvgW6XeLWbXxoWPMmzM7h5lwuTpB",
         session=bot.session,
@@ -22,35 +27,20 @@ async def pain(cursor: Cursor, bot: commands.Bot) -> None:
             if 'ack' in doc and doc['ack'] == 1:
                 continue
             if doc["type"] == "config":
-                del doc["file"]
-                await webhook.send(
-                    doc["message"],
-                    embed=discord.Embed(
-                        description=json.dumps(doc["returned"], indent=4)
-                    ),
-                    allowed_mentions=discord.AllowedMentions(
-                        everyone=False, users=True, roles=False
-                    ),
-                )
+                await handle_config_upload(doc, webhook)
             elif doc["type"] == "chat":
                 pass
             elif doc["type"] == "change_mob":
-                channel: discord.TextChannel = bot.get_channel(927300714508730418)
-                embed: discord.Embed = discord.Embed(
-                    description=f"Current Totem Mob: **{doc['mobName']}**", colour=discord.Colour.random(),
-                    timestamp=discord.utils.utcnow(),
-                )
-                embed.set_footer(text="Last Updated at: ")
-                await bot.get_channel(927300714508730418).get_partial_message(1006353427862917222).edit(
-                    embed=embed,
-                    content=None,
-                )
-                await channel.send(doc['message'])
-
-                await bot.db.duckMinecraft.messages.update_one(doc, {"$set": {'ack': 1}}) # documents must be the same size.
+                await handle_change_mob(doc, bot)
             else:
                 await webhook.send(doc)
         await asyncio.sleep(1)
+
+    await asyncio.sleep(5)
+    await pain(
+        collection,
+        bot,
+    )
 
 
 def use_files():
@@ -74,9 +64,7 @@ class SMPFile(commands.Cog):
     async def cog_load(self) -> None:
         asyncio.create_task(
             pain(
-                self.collection.find(
-                    (), cursor_type=pymongo.CursorType.TAILABLE_AWAIT, oplog_replay=True
-                ),
+                self.collection,
                 self.bot,
             )
         )
