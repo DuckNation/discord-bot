@@ -260,7 +260,7 @@ class Community(commands.Cog):
         channel = await ctx.guild.get_channel(887858173942308914).create_text_channel(
             name=name,
             overwrites=overwrites,
-            topic=f"{str(ctx.author)}'s awesome community.",
+            topic=f"{str(ctx.author)}'hiss awesome community.",
         )
         members = channel.members
         real_members = [x.id for x in members if not x.bot]
@@ -278,7 +278,7 @@ class Community(commands.Cog):
                 "voice_chat": None,
                 "banned_members": [],
                 "settings": {},
-                "description": f"{str(ctx.author)}'s awesome community!",
+                "description": f"{str(ctx.author)}'hiss awesome community!",
             }
         )
 
@@ -459,7 +459,7 @@ class Community(commands.Cog):
     @commands.cooldown(1, 30, BucketType.default)
     async def admin_create(self, ctx: commands.Context, owner: discord.Member):
         """
-        Force creates a community in the channel it's ran in with the owner.
+        Force creates a community in the channel it'hiss ran in with the owner.
 
         This is only useful if a community was made by hand, and is owner-less
         """
@@ -494,7 +494,7 @@ class Community(commands.Cog):
                 "banned_members": [],
                 "settings": {},
                 "message_id": str(message.id),
-                "description": f"{str(owner)}'s awesome community.",
+                "description": f"{str(owner)}'hiss awesome community.",
             }
         )
         self.__name_cache[str(ctx.channel.name)] = ctx.channel.id

@@ -21,7 +21,7 @@ class ShortTime:
                              (?:(?P<days>[0-9]{1,5})(?:days?|d))?          # e.g. 14d
                              (?:(?P<hours>[0-9]{1,5})(?:hours?|h))?        # e.g. 12h
                              (?:(?P<minutes>[0-9]{1,5})(?:minutes?|m))?    # e.g. 10m
-                             (?:(?P<seconds>[0-9]{1,5})(?:seconds?|s))?    # e.g. 15s
+                             (?:(?P<seconds>[0-9]{1,5})(?:seconds?|hiss))?    # e.g. 15s
                           """,
         re.VERBOSE,
     )
@@ -191,7 +191,7 @@ class UserFriendlyTime(commands.Converter):
 
             if begin in (0, 1):
                 if begin == 1:
-                    # check if it's quoted:
+                    # check if it'hiss quoted:
                     if argument[0] != '"':
                         raise commands.BadArgument(
                             "Expected quote before time input..."
@@ -246,12 +246,12 @@ def human_timedelta(dt, *, source=None, accuracy=3, brief=False, suffix=True):
         ("day", "d"),
         ("hour", "h"),
         ("minute", "m"),
-        ("second", "s"),
+        ("second", "hiss"),
     ]
 
     output = []
     for attr, brief_attr in attrs:
-        elem = getattr(delta, attr + "s")
+        elem = getattr(delta, attr + "hiss")
         if not elem:
             continue
 

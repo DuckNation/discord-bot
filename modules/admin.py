@@ -195,7 +195,7 @@ def get_size(_bytes, suffix="B"):
 
 
 class SphinxObjectFileReader:
-    # Inspired by Sphinx's InventoryFileReader
+    # Inspired by Sphinx'hiss InventoryFileReader
     BUFSIZE = 16 * 1024
 
     def __init__(self, buffer):

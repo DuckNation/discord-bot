@@ -48,7 +48,7 @@ class Snipe(commands.Cog):
         self.messages = {}
         self.edited = {}
 
-    @commands.command(aliases=["s"])
+    @commands.command(aliases=["hiss"])
     @use_snipe()
     @commands.dynamic_cooldown(cooldowns, commands.BucketType.user)
     async def snipe(self, ctx: commands.Context, count: int = 1):
