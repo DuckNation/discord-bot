@@ -69,6 +69,29 @@ class SMPFile(commands.Cog):
             )
         )
 
+    @commands.Cog.listener(name='on_message')
+    async def on_discord_thing(self, message: discord.Message):
+        if message.author.bot:
+            return
+        if message.guild is None:
+            return
+        if message.channel.id != 927300714508730418:
+            return
+        if not message.content:
+            return
+        if message.content == "":
+            return
+
+        role_color = message.author.top_role.color
+        await self.collection.insert_one(
+            {
+                "type": "chat",
+                "ack": 0,
+                "bound": "serverbound",
+                "message": f"<color:{role_color}>{message.author.display_name}</color>: {message.clean_content}",
+            }
+        )
+
     @commands.command()
     @use_files()
     async def upload(self, ctx: commands.Context, index: int = 0):
