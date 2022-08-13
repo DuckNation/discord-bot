@@ -1,16 +1,14 @@
 import asyncio
-import json
 
 import discord
 import pymongo
 from discord.ext import commands
 from pymongo.collection import Collection
 
-from main import Duck
-from modules.mongoUtils import handle_change_mob, handle_config_upload
+from modules.mongoUtils import handle_change_mob, handle_config_upload, handle_player_stuff
 
 
-async def pain(collection: Collection, bot: Duck) -> None:
+async def pain(collection: Collection, bot: commands.Bot) -> None:
     await bot.wait_until_ready()
     cursor = collection.find(
         (), cursor_type=pymongo.CursorType.TAILABLE_AWAIT, oplog_replay=True
@@ -26,14 +24,16 @@ async def pain(collection: Collection, bot: Duck) -> None:
                 continue
             if 'ack' in doc and doc['ack'] == 1:
                 continue
-            if doc["type"] == "config":
-                await handle_config_upload(doc, webhook)
-            elif doc["type"] == "chat":
-                pass
-            elif doc["type"] == "change_mob":
-                await handle_change_mob(doc, bot)
-            else:
-                await webhook.send(doc)
+            match doc['type']:
+                case 'change_mob':
+                    await handle_change_mob(doc, bot)
+                case 'config':
+                    await handle_config_upload(doc, webhook)
+                case 'chat' | 'quit' | 'join' | 'death' | 'advancement' | 'player_count':
+                    await handle_player_stuff(doc['type'], doc, bot, webhook)
+                case _:
+                    print(f"Unknown type: {doc['type']}")
+                    print(doc)
         await asyncio.sleep(1)
 
     await asyncio.sleep(5)

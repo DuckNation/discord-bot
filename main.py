@@ -1,4 +1,6 @@
+import asyncio
 import json
+import traceback
 
 import aiohttp
 import aiosqlite
@@ -62,7 +64,8 @@ class Duck(commands.Bot):
                 await self.load_extension(ext)
                 print(f"Loaded {ext}")
             except Exception as e:
-                print(e)
+                print(f"Failed to load {ext}")
+                traceback.print_tb(e.__traceback__)
 
     async def close(self) -> None:
         await self.session.close()
@@ -83,6 +86,7 @@ class Duck(commands.Bot):
 #         await duck.start(config["bot-token"])
 #         # await Duck().sync()
 
-
-duck = Duck()
-duck.run(config["bot-token"], reconnect=True)
+if __name__ == "__main__":
+    asyncio.run(
+        Duck().start(config["bot-token"], reconnect=True)
+    )

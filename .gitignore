@@ -1,6 +1,6 @@
 # Custom
 config.json
-
+duck.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
