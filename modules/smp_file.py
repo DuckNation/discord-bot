@@ -118,6 +118,7 @@ class SMPFile(commands.Cog):
                 "index": index,
             }
         )
+        await ctx.message.delete()
         await ctx.send("Uploaded!")
 
 
