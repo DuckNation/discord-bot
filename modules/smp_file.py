@@ -1,9 +1,13 @@
 import asyncio
+import json
 
+import async_timeout
 import discord
 import pymongo
+from aioredis import Redis
 from discord.ext import commands
 from pymongo.collection import Collection
+import aioredis
 
 from modules.mongoUtils import handle_change_mob, handle_config_upload, handle_player_stuff
 
@@ -14,7 +18,8 @@ async def pain(collection: Collection, bot: commands.Bot) -> None:
         (), cursor_type=pymongo.CursorType.TAILABLE_AWAIT, oplog_replay=True
     )
     webhook: discord.Webhook = discord.Webhook.from_url(
-        "https://discord.com/api/webhooks/1006624911990718464/PT8h7zGxQcd5HDz2CN6LX6ZmJn69aO9W8ci0UgaYdvgW6XeLWbXxoWPMmzM7h5lwuTpB",
+        "https://discord.com/api/webhooks/1006624911990718464"
+        "/PT8h7zGxQcd5HDz2CN6LX6ZmJn69aO9W8ci0UgaYdvgW6XeLWbXxoWPMmzM7h5lwuTpB",
         session=bot.session,
     )
 
@@ -43,6 +48,24 @@ async def pain(collection: Collection, bot: commands.Bot) -> None:
     )
 
 
+async def reader(channel: aioredis.client.PubSub, bot: commands.Bot):
+    webhook: discord.Webhook = discord.Webhook.from_url(
+        "https://discord.com/api/webhooks/1006624911990718464"
+        "/PT8h7zGxQcd5HDz2CN6LX6ZmJn69aO9W8ci0UgaYdvgW6XeLWbXxoWPMmzM7h5lwuTpB",
+        session=bot.session,
+    )
+    while True:
+        try:
+            async with async_timeout.timeout(1):
+                message = await channel.get_message(ignore_subscribe_messages=True)
+                if message is not None:
+                    thing = json.loads(message['data'])
+                    await handle_player_stuff(thing['type'], thing, bot, webhook)
+                await asyncio.sleep(0.01)
+        except asyncio.TimeoutError:
+            pass
+
+
 def use_files():
     def predicate(ctx: commands.Context):
         return (
@@ -53,6 +76,18 @@ def use_files():
     return commands.check(predicate)
 
 
+async def redis_thing(bot) -> Redis:
+    redis = aioredis.from_url("redis://smp.quack.tk")
+    await redis.execute_command("AUTH",
+                                "Vev9nBGCXbPVm6QGv+PPqqWd2ItmuASiJVXLweTVk2mJ1ZQeHA5nT9/+PW1nVgooANa0aVl6U0z285Va")
+    pubsub = redis.pubsub()
+    await pubsub.subscribe("discord")
+    future = asyncio.create_task(reader(pubsub, bot))
+    await future
+
+    return redis
+
+
 class SMPFile(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -60,13 +95,17 @@ class SMPFile(commands.Cog):
         self.collection: Collection = self.bot.db.get_database(
             "duckMinecraft"
         ).get_collection("messages")
+        self.task_redis = None
 
     async def cog_load(self) -> None:
-        asyncio.create_task(
-            pain(
-                self.collection,
-                self.bot,
-            )
+        # asyncio.create_task(
+        #     pain(
+        #         self.collection,
+        #         self.bot,
+        #     )
+        # )
+        self.task_redis = asyncio.create_task(
+            redis_thing(self.bot)
         )
 
     @commands.Cog.listener(name='on_message')
@@ -83,6 +122,7 @@ class SMPFile(commands.Cog):
             return
 
         role_color = message.author.top_role.color
+        # await self.task_redis.publish("minecraft", "Hello")
         await self.collection.insert_one(
             {
                 "type": "chat",
