@@ -121,7 +121,7 @@ class SMPFile(commands.Cog):
         if message.content == "":
             return
 
-        role_color = message.author.top_role.color
+        role_color = message.author.top_role.color # todo use aioredis fully
         # await self.task_redis.publish("minecraft", "Hello")
         await self.collection.insert_one(
             {

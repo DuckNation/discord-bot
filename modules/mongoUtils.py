@@ -61,6 +61,6 @@ async def handle_player_stuff(_type: str, doc: dict, bot: Duck, webhook: discord
         return
 
     # everything else
-    embed = discord.Embed(description=doc['message'], colour=embed_color_mapping[_type], timestamp=discord.utils.utcnow())
+    embed = discord.Embed(description=doc['message'].replace("\\*", "*"), colour=embed_color_mapping[_type], timestamp=discord.utils.utcnow())
     await webhook.send(username=doc['playerName'], embed=embed, avatar_url=uuid_skin_mapping[doc['playerUUID']], allowed_mentions=discord.AllowedMentions(everyone=False, roles=False, users=False))
 
