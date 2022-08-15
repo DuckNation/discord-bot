@@ -49,7 +49,7 @@ async def handle_player_stuff(_type: str, doc: dict, bot: Duck, webhook: discord
     await bot.db.duckMinecraft.messages.update_one(doc, {"$set": {'ack': 1}})  # documents must be the same size.
     if _type == 'player_count':
         channel: discord.TextChannel = bot.get_channel(927300714508730418)
-        await channel.edit(topic=str(doc['message']))
+        await channel.edit(topic=str(doc['message']).replace("\\*", "*"))
         await bot.db.duckMinecraft.messages.update_one(doc, {"$set": {'ack': 1}})  # documents must be the same size.
         # todo edit an embed that contains all online players.
         return
