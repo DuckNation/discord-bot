@@ -3,6 +3,7 @@ import json
 import traceback
 
 import aiohttp
+import aioredis
 import aiosqlite
 import discord
 import discord.ext
@@ -13,22 +14,24 @@ from discord.ext import commands
 config = json.load(open("config.json"))
 
 _modules = (
-    "modules.utils.errorHandling",
-    "modules.snipe",
-    "modules.admin",
-    "modules.antiOk",
-    "modules.antiabuse",
+    # "modules.utils.errorHandling",
+    # "modules.snipe",
+    # "modules.admin",
+    # "modules.antiOk",
+    # "modules.antiabuse",
     "jishaku",
-    "modules.community",
+    "modules.smp_listener",
+    # "modules.community",
     # "modules.antiSaaddi",
-    "modules.smp_file",
-    "modules.inGameLinking",
+    # "modules.smp_file",
+    # "modules.inGameLinking",
     # "modules.dynamicTime",
 )
 
 
 class Duck(commands.Bot):
     def __init__(self, **kwargs):
+        self.redis = None
         self.sqlite = None
         allowed_mentions = discord.AllowedMentions(
             roles=False, everyone=False, users=True
@@ -54,10 +57,11 @@ class Duck(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.sqlite = await aiosqlite.connect("duck.db")
-        self.db: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(
-            config["database-uri"],
-            uuidRepresentation='standard'
-        )
+        self.redis: aioredis.ConnectionPool = await aioredis.from_url("redis://140.238.99.2:6247", username="default", password="NnEGKjeeagtl0QWk/2zgS304uRMR5zULITFNgRpgqxpz+Ryag6XRlfxmT57DGXJqkuDjCkU7YJBcl+nHeQLJmgr2713OJbmq82YV/DfdYMvtNRnb/N5ayoqDJ8xN0yh0MJUW3ByRHsWWt7KQMoRkCSmoevWLSZ7+")
+        # self.db: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(
+        #     config["database-uri"],
+        #     uuidRepresentation='standard'
+        # )
         self.session = aiohttp.ClientSession()
         for ext in _modules:
             try:
