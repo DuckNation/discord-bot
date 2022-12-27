@@ -26,7 +26,7 @@ class SMPListener(commands.Cog):
         if message.content == "":
             return
         try:
-            await self.redis.publish("minecraft", f"<blue>[Discord]</blue> <dark_green>{message.author.display_name}</dark_green><gray>:</gray> <reset>{message.content}")
+            await self.redis.publish("minecraft", f"chat;<blue>[Discord]</blue> <dark_green>{message.author.display_name}</dark_green><gray>:</gray> <reset>{message.content}")
         except Exception as e:
             print(e)
         print("a")
@@ -40,6 +40,10 @@ class SMPListener(commands.Cog):
             await pubsub.subscribe("discord")
             future = asyncio.create_task(self.reader(pubsub))
             await future
+
+    @commands.command()
+    async def list(self, ctx: commands.Context):
+        await self.redis.publish("minecraft", "getList;")
 
     async def reader(self, channel: aioredis.client.PubSub):
         while True:
@@ -71,6 +75,8 @@ class SMPListener(commands.Cog):
                 await self.channel.send(embed=discord.Embed(description=f"{message}", colour=discord.Colour.red()), allowed_mentions=discord.AllowedMentions.none())
             case "advancement":
                 await self.channel.send(embed=discord.Embed(description=f"{message}", colour=discord.Colour.blue()), allowed_mentions=discord.AllowedMentions.none())
+            case "returnList":
+                await self.channel.send(embed=discord.Embed(description=f"{message}", colour=discord.Colour.orange()), allowed_mentions=discord.AllowedMentions.none())
 
 
 
