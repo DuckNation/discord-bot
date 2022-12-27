@@ -29,7 +29,6 @@ class SMPListener(commands.Cog):
             await self.redis.publish("minecraft", f"chat;<blue>[Discord]</blue> <dark_green>{message.author.display_name}</dark_green><gray>:</gray> <reset>{message.content}")
         except Exception as e:
             print(e)
-        print("a")
 
     @commands.Cog.listener()
     async def on_ready(self):
