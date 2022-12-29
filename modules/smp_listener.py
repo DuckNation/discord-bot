@@ -75,7 +75,7 @@ class SMPListener(commands.Cog):
             case "advancement":
                 await self.channel.send(embed=discord.Embed(description=f"{message}", colour=discord.Colour.blue()), allowed_mentions=discord.AllowedMentions.none())
             case "returnList":
-                await self.channel.send(embed=discord.Embed(description=f"{message}", colour=discord.Colour.orange()), allowed_mentions=discord.AllowedMentions.none())
+                await self.channel.send(embed=discord.Embed(title="Online Players", description=f"{message}", colour=discord.Colour.orange()), allowed_mentions=discord.AllowedMentions.none())
 
 
 
