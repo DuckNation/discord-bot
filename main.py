@@ -4,28 +4,15 @@ import traceback
 
 import aiohttp
 import aioredis
-import aiosqlite
 import discord
 import discord.ext
-import motor.motor_asyncio
-import pymongo
 from discord.ext import commands
 
 config = json.load(open("config.json"))
 
 _modules = (
-    # "modules.utils.errorHandling",
-    # "modules.snipe",
-    # "modules.admin",
-    # "modules.antiOk",
-    # "modules.antiabuse",
     "jishaku",
-    "modules.smp_listener",
-    # "modules.community",
-    # "modules.antiSaaddi",
-    # "modules.smp_file",
-    # "modules.inGameLinking",
-    # "modules.dynamicTime",
+    "modules.smp",
 )
 
 
@@ -43,8 +30,6 @@ class Duck(commands.Bot):
             emojis=True,
             voice_states=True,
             messages=True,
-            reactions=True,
-            presences=True,
             message_content=True,
         )
         super().__init__(
@@ -56,18 +41,16 @@ class Duck(commands.Bot):
         )
 
     async def setup_hook(self) -> None:
-        self.sqlite = await aiosqlite.connect("duck.db")
-        self.redis: aioredis.ConnectionPool = await aioredis.from_url("redis://140.238.99.2:6247", username="default", password="NnEGKjeeagtl0QWk/2zgS304uRMR5zULITFNgRpgqxpz+Ryag6XRlfxmT57DGXJqkuDjCkU7YJBcl+nHeQLJmgr2713OJbmq82YV/DfdYMvtNRnb/N5ayoqDJ8xN0yh0MJUW3ByRHsWWt7KQMoRkCSmoevWLSZ7+")
-        # self.db: pymongo.MongoClient = motor.motor_asyncio.AsyncIOMotorClient(
-        #     config["database-uri"],
-        #     uuidRepresentation='standard'
-        # )
+        self.redis: aioredis.ConnectionPool = await aioredis.from_url(
+            f"redis://{config['redis-ip']}:{config['redis-port']}", username="default",
+            password=config["redis-password"])
         self.session = aiohttp.ClientSession()
         for ext in _modules:
             try:
                 await self.load_extension(ext)
                 print(f"Loaded {ext}")
             except Exception as e:
+                print(e)
                 print(f"Failed to load {ext}")
                 traceback.print_tb(e.__traceback__)
 
@@ -78,9 +61,6 @@ class Duck(commands.Bot):
 
     async def on_ready(self):
         print("Bot is ready.")
-        # await self.load_extension('modules.slashPain')
-        # self.tree.add_command(self.fruit, guild=discord.Object(id=790774812690743306))
-        # self.loop.create_task(self.sync())
 
 
 # async def main():

@@ -1,14 +1,7 @@
 name: Black
 
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the main branch
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  push
 
 jobs:
   run-linters:
@@ -22,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.10
 
       - name: Install Python dependencies
         run: pip install black flake8
@@ -30,5 +23,5 @@ jobs:
       - name: Run linters
         uses: wearerequired/lint-action@v1
         with:
-          auto_fix: ${{ github.event_name == 'pull_request' }}
+          auto_fix: true
           black: true
