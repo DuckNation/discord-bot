@@ -58,9 +58,10 @@ class SMP(commands.Cog):
             await self.channel.edit(topic=msg)
         elif _type == 'death':
             await self.channel.send(embed=discord.Embed(description=msg, color=discord.Color.red()))
+        elif _type == 'staff_chat':
+            await self.bot.get_channel(928025454953234473).send(msg)
         else:
-            await self.channel.send("<@578006934507094016>",
-                                    embed=discord.Embed(description=msg, color=discord.Color.red()))
+            await self.channel.send(f"<@578006934507094016>, unsupported packet type: **{_type}**\n```" + msg + "```")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -69,6 +70,8 @@ class SMP(commands.Cog):
         if message.channel == self.channel:
             await self.bot.redis.publish("toMinecraft",
                                          f"chat;<blue>[Discord]</blue> <dark_green>{message.author.name}</dark_green><gray>:</gray> <reset>{message.content}")
+        elif message.channel.id == 928025454953234473:
+            await self.bot.redis.publish("toMinecraft", f"staff_chat;<red>[STAFF] </red><gold>{message.author.name}: {message.content}")
 
 
 async def setup(bot):

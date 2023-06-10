@@ -7,3 +7,4 @@ class ChatEnums(str, Enum):
     CHAT = 'chat'
     UPDATE = 'update'
     DEATH = 'death'
+    STAFF_CHAT = 'staff_chat'
