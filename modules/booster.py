@@ -149,11 +149,6 @@ class Booster(commands.Cog):
                 await Boosters.delete(key)
                 await role.delete(reason="Owner no longer in guild.")
                 continue
-            if booster_role not in role.members[0].roles:
-                await role.delete(reason="Owner no longer a booster.")
-                users_not_in_cache.remove(key)
-                await Boosters.delete(key)
-                continue
             users_not_in_cache.remove(key)
         for user_id in users_not_in_cache:
             await Boosters.insert(user_id, None)
