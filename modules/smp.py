@@ -71,7 +71,8 @@ class SMP(commands.Cog):
             await self.bot.redis.publish("toMinecraft",
                                          f"chat;<blue>[Discord]</blue> <dark_green>{message.author.name}</dark_green><gray>:</gray> <reset>{message.content}")
         elif message.channel.id == 928025454953234473:
-            await self.bot.redis.publish("toMinecraft", f"staff_chat;<red>[STAFF] </red><gold>{message.author.name}: {message.content}")
+            await self.bot.redis.publish("toMinecraft",
+                                         f"staff_chat;<red>[STAFF]</red> <gold>{message.author.name}: {message.content}")
 
 
 async def setup(bot):

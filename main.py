@@ -8,11 +8,14 @@ import discord
 import discord.ext
 from discord.ext import commands
 
+from modules.booster_redis import Boosters
+
 config = json.load(open("config.json"))
 
 _modules = (
     "jishaku",
     "modules.smp",
+    "modules.booster"
 )
 
 
@@ -45,6 +48,7 @@ class Duck(commands.Bot):
             f"redis://{config['redis-ip']}:{config['redis-port']}", username="default",
             password=config["redis-password"])
         self.session = aiohttp.ClientSession()
+        await Boosters(self.redis).load_cache()
         for ext in _modules:
             try:
                 await self.load_extension(ext)
