@@ -34,6 +34,12 @@ class Dropdown(discord.ui.Select):
             #     value="icon",
             # ),
             discord.SelectOption(
+                label="Hoist",
+                description="Toggle whether your role is hoisted.",
+                emoji="📌",
+                value="hoist",
+            ),
+            discord.SelectOption(
                 label="Delete",
                 description="Delete your custom role.",
                 emoji="❌",
@@ -181,6 +187,10 @@ class Booster(commands.Cog):
             )
         elif option == "delete":
             return await Booster.delete(
+                bot, interaction, interaction.guild.get_role(role_id)
+            )
+        elif option == "hoist":
+            return await Booster.hoist(
                 bot, interaction, interaction.guild.get_role(role_id)
             )
         else:
@@ -515,7 +525,7 @@ class Booster(commands.Cog):
             await role.delete(reason="Custom role deleted.")
         return discord.Embed(description="Goodbye!", colour=discord.Colour.green())
 
-    @commands.command()
+    @commands.command(aliases=['br', 'boosterrole'])
     # booster | staff team
     @commands.has_any_role(870049849414942771, 888578948445900831)
     @commands.cooldown(1, 10, commands.BucketType.user)
@@ -765,6 +775,19 @@ class Booster(commands.Cog):
         img.save(file, "png")
         file.seek(0)
         return bytes(file.read())
+
+    @staticmethod
+    async def hoist(bot, interaction, param: discord.Role):
+        if param.hoist:
+            await param.edit(hoist=False)
+            await interaction.response.send_message(
+                f"Successfully unhoisted {param.mention}!", ephemeral=True
+            )
+        else:
+            await param.edit(hoist=True)
+            await interaction.response.send_message(
+                f"Successfully hoisted {param.mention}!", ephemeral=True
+            )
 
 
 async def setup(bot):
