@@ -1,8 +1,8 @@
 import asyncio
 
-import aioredis
-import async_timeout
+import aiohttp
 import discord
+import websockets
 from discord.ext import commands, tasks
 
 
@@ -10,69 +10,63 @@ class SMP(commands.Cog):
     def __init__(self, bot):
         self.ready = False
         self.bot = bot
+        self.session: aiohttp.ClientSession = bot.session
+        self.mapping = {}
+        self.ws_mapping = {}
 
     @tasks.loop(seconds=1, count=1)
     async def setup_task(self):
         self.channel: discord.TextChannel = self.bot.get_channel(927300714508730418)
-        pubsub = self.bot.redis.pubsub()
-        await pubsub.subscribe("toDiscord")
-        future = asyncio.create_task(self.reader(pubsub))
-        await future
 
     @commands.Cog.listener()
     async def on_ready(self):
         if not self.ready:
             self.ready = True
             self.channel = self.bot.get_channel(927300714508730418)
-            pubsub = self.bot.redis.pubsub()
-            await pubsub.subscribe("toDiscord")
-            future = asyncio.create_task(self.reader(pubsub))
-            await future
+            self.mapping["global"] = self.channel.id
+            task = asyncio.ensure_future(self.connect("global", 927300714508730418))
+            await task
 
-    # async def cog_load(self) -> None:
-    #     self.setup_task.start()
+    async def connect(self, path, channel_id):
+        async with websockets.connect(f"wss://quack.boo/internal/api/wss/{path}?key={self.bot.api_key}") as ws:
+            self.ws_mapping[channel_id] = ws
+            while True:
+                msg = await ws.recv()
+                split = msg.split(";")
+                print(split)
+                if split[0] == "create_discord_channel":
+                    await self.create_channel(split[1], split[2])
+                if split[0] == "chat":
+                    await self.chat(self.mapping[path], split[1])
 
-    async def reader(self, channel: aioredis.client.PubSub):
-        while True:
-            try:
-                async with async_timeout.timeout(1):
-                    message = await channel.get_message(ignore_subscribe_messages=True)
-                    if message:
-                        data = bytes(message["data"]).decode("utf-8")
-                        print(data)
-                        await self.handle_type(data.split(';')[0], ';'.join(data.split(';')[1:]))
-                    await asyncio.sleep(0.01)
-            except asyncio.TimeoutError:
-                pass
+    async def create_channel(self, internal_id: str, name: str):
+        if internal_id in self.mapping:
+            return
+        async with self.session.get(
+                f"http://127.0.0.1:6420/api/chats/get?key={self.bot.api_key}&chat_uuid={internal_id}") as resp:
+            data = await resp.json()
+            if len(data) != 1:
+                return
+            data = data[0]
+        _id = data['discord_id'] if 'discord_id' in data else None
+        if 'discord_id' not in data:
+            thread = await self.channel.create_thread(type=None, invitable=True, auto_archive_duration=10080, name=name)
+            _id = thread.id
+            await self.session.put(
+                f"http://127.0.0.1:6420/api/chats/set-discord?key={self.bot.api_key}&chat_uuid={internal_id}&channel_id={_id}")
 
-    async def handle_type(self, _type, msg):
-        # enum_type = ChatEnums(_type)
+        self.mapping[internal_id] = _id
+        asyncio.create_task(self.connect(internal_id, _id))
 
-        if _type == 'join':
-            await self.channel.send(embed=discord.Embed(description=msg, color=discord.Color.green()))
-        elif _type == 'leave':
-            await self.channel.send(embed=discord.Embed(description=msg, color=discord.Color.red()))
-        elif _type == 'chat':
-            await self.channel.send(msg, allowed_mentions=discord.AllowedMentions.none())
-        elif _type == 'update':
-            await self.channel.edit(topic=msg)
-        elif _type == 'death':
-            await self.channel.send(embed=discord.Embed(description=msg, color=discord.Color.red()))
-        elif _type == 'staff_chat':
-            await self.bot.get_channel(928025454953234473).send(msg)
-        else:
-            await self.channel.send(f"<@578006934507094016>, unsupported packet type: **{_type}**\n```" + msg + "```")
+    async def chat(self, channel_id: int, message: str):
+        await self.bot.get_channel(channel_id).send(message)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
-        if message.channel == self.channel:
-            await self.bot.redis.publish("toMinecraft",
-                                         f"chat;<blue>[Discord]</blue> <dark_green>{message.author.name}</dark_green><gray>:</gray> <reset>{message.content}")
-        elif message.channel.id == 928025454953234473:
-            await self.bot.redis.publish("toMinecraft",
-                                         f"staff_chat;<red>[STAFF]</red> <gold>{message.author.name}: {message.content}")
+        if message.channel.id in self.ws_mapping:
+            await self.ws_mapping[message.channel.id].send(f"chat;{message.content}")
 
 
 async def setup(bot):

@@ -23,6 +23,7 @@ class Duck(commands.Bot):
     def __init__(self, **kwargs):
         self.redis = None
         self.sqlite = None
+        self.api_key: str = config["api-key"]
         allowed_mentions = discord.AllowedMentions(
             roles=False, everyone=False, users=True
         )
