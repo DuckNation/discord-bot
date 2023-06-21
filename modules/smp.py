@@ -36,8 +36,14 @@ class SMP(commands.Cog):
                 print(split)
                 if split[0] == "create_discord_channel":
                     await self.create_channel(split[1], split[2])
+                if split[0] == "update":
+                    await self.channel.edit(topic=split[1])
                 if split[0] == "chat":
                     await self.chat(self.mapping[path], split[1])
+                if split[0] == "join":
+                    await self.channel.send(embed=discord.Embed(description=split[1], colour=discord.Colour.green()))
+                if split[0] == "leave":
+                    await self.channel.send(embed=discord.Embed(description=split[1], colour=discord.Colour.red()))
 
     async def create_channel(self, internal_id: str, name: str):
         if internal_id in self.mapping:
@@ -59,7 +65,7 @@ class SMP(commands.Cog):
         asyncio.create_task(self.connect(internal_id, _id))
 
     async def chat(self, channel_id: int, message: str):
-        await self.bot.get_channel(channel_id).send(message)
+        await self.bot.get_channel(channel_id).send(message, allowed_mentions=discord.AllowedMentions.none())
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
