@@ -72,7 +72,7 @@ class SMP(commands.Cog):
         if message.author.bot:
             return
         if message.channel.id in self.ws_mapping:
-            await self.ws_mapping[message.channel.id].send(f"chat;{message.content}")
+            await self.ws_mapping[message.channel.id].send(f"chat;<blue>[Discord]</blue> <dark_green>{message.author.name}</dark_green><gray>:</gray> <reset>{message.content}")
 
 
 async def setup(bot):
