@@ -133,8 +133,9 @@ class Booster(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        booster_role: discord.Role = self.duck_guild.get_role(int(870049849414942771))
-        users_not_in_cache = [member.id for member in booster_role.members]
+        users_not_in_cache = [member.id for member in self.duck_guild.get_role(int(888106790192033792)).members]
+        users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(888578948445900831)).members])
+        users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(870049849414942771)).members])
         for key, value in Boosters.cache.copy().items():
             if not value:
                 try:
@@ -145,7 +146,7 @@ class Booster(commands.Cog):
             role: discord.Role = self.duck_guild.get_role(int(value))
             if not role:
                 continue
-            if len(role.members) != 1:
+            if len(role.members) < 1:
                 await Boosters.delete(key)
                 await role.delete(reason="Owner no longer in guild.")
                 continue
@@ -521,8 +522,8 @@ class Booster(commands.Cog):
         return discord.Embed(description="Goodbye!", colour=discord.Colour.green())
 
     @commands.command(aliases=['br', 'boosterrole'])
-    # booster | staff team
-    @commands.has_any_role(870049849414942771, 888578948445900831)
+    # booster | staff team | level 20
+    @commands.has_any_role(870049849414942771, 888578948445900831, 888106790192033792)
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.max_concurrency(1, commands.BucketType.user)
     async def custom_role(self, ctx: commands.Context) -> None:
@@ -737,14 +738,20 @@ class Booster(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, _: discord.Member, after: discord.Member):
-        if after.get_role(int(870049849414942771)) in after.roles:
-            if after.id not in Boosters.cache.keys():
-                await Boosters.insert(after.id, None)
-        else:
-            if after.id in Boosters.cache.keys():
-                await self.delete_custom_role(after.guild, Boosters.cache[after.id])
-                await Boosters.delete(after.id)
-                await after.edit(nick=None, reason="Boost ended")
+        allowed_roles = [
+            after.get_role(888106790192033792),
+            after.get_role(870049849414942771),
+            after.get_role(888578948445900831)
+        ]
+        for role in allowed_roles:
+            if role in after.roles:
+                if after.id not in Boosters.cache.keys():
+                    await Boosters.insert(after.id, None)
+                    return
+        if after.id in Boosters.cache.keys():
+            await self.delete_custom_role(after.guild, Boosters.cache[after.id])
+            await Boosters.delete(after.id)
+            await after.edit(reason="Boost ended?")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -783,6 +790,7 @@ class Booster(commands.Cog):
             await interaction.response.send_message(
                 f"Successfully hoisted {param.mention}!", ephemeral=True
             )
+        return discord.Embed()
 
 
 async def setup(bot):
