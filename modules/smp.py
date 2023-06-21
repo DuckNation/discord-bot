@@ -49,7 +49,7 @@ class SMP(commands.Cog):
         if internal_id in self.mapping:
             return
         async with self.session.get(
-                f"http://127.0.0.1:6420/api/chats/get?key={self.bot.api_key}&chat_uuid={internal_id}") as resp:
+                f"https://quack.boo/internal/api/chats/get?key={self.bot.api_key}&chat_uuid={internal_id}") as resp:
             data = await resp.json()
             if len(data) != 1:
                 return
@@ -59,7 +59,7 @@ class SMP(commands.Cog):
             thread = await self.channel.create_thread(type=None, invitable=True, auto_archive_duration=10080, name=name)
             _id = thread.id
             await self.session.put(
-                f"http://127.0.0.1:6420/api/chats/set-discord?key={self.bot.api_key}&chat_uuid={internal_id}&channel_id={_id}")
+                f"https://quack.boo/internal/api/chats/set-discord?key={self.bot.api_key}&chat_uuid={internal_id}&channel_id={_id}")
 
         self.mapping[internal_id] = _id
         asyncio.create_task(self.connect(internal_id, _id))
