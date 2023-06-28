@@ -42,9 +42,9 @@ class Duck(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.redis: aioredis.ConnectionPool = await aioredis.from_url(
-            f"redis://{os.getenv('REDIS_IP')}:{os.getenv('redis-port')}",
+            f"redis://{os.getenv('REDIS_IP')}:{os.getenv('REDIS_PORT')}",
             username="default",
-            password=os.getenv("redis-password"),
+            password=os.getenv("REDIS_PASSWORD"),
         )
         self.session = aiohttp.ClientSession()
         await Boosters(self.redis).load_cache()
@@ -74,4 +74,4 @@ class Duck(commands.Bot):
 #         # await Duck().sync()
 
 if __name__ == "__main__":
-    asyncio.run(Duck().start(os.getenv("bot-token"), reconnect=True))
+    asyncio.run(Duck().start(os.getenv("BOT_TOKEN"), reconnect=True))
