@@ -70,7 +70,7 @@ class DropDownView(discord.ui.View):
 
     @discord.ui.button(label="Close Menu", style=discord.ButtonStyle.red)
     async def close(
-            self, interaction: discord.Interaction, button: discord.ui.Button  # noqa
+        self, interaction: discord.Interaction, button: discord.ui.Button  # noqa
     ):
         await interaction.response.defer()
         await self.on_timeout()
@@ -80,7 +80,7 @@ class DropDownView(discord.ui.View):
             await interaction.response.send_message(
                 embed=discord.Embed(
                     description=f"You can't use this menu. It's "
-                                f"intended for <@{self.owner}>.",
+                    f"intended for <@{self.owner}>.",
                     colour=0xFF0000,
                 ),
                 ephemeral=True,
@@ -104,7 +104,7 @@ class Confirm(discord.ui.View):
 
     @discord.ui.button(label="Delete Role", style=discord.ButtonStyle.red)
     async def close(
-            self, interaction: discord.Interaction, button: discord.ui.Button
+        self, interaction: discord.Interaction, button: discord.ui.Button
     ):  # noqa
         await interaction.response.send_message("Deleting role...")
         self.value = True
@@ -116,7 +116,7 @@ class Confirm(discord.ui.View):
             await interaction.response.send_message(
                 embed=discord.Embed(
                     description=f"You can't use this menu. It's "
-                                f"intended for <@{self.owner}>.",
+                    f"intended for <@{self.owner}>.",
                     colour=0xFF0000,
                 ),
                 ephemeral=True,
@@ -126,17 +126,34 @@ class Confirm(discord.ui.View):
 
 
 class Booster(commands.Cog):
-
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.duck_guild: discord.Guild = bot.get_guild(790774812690743306)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        users_not_in_cache = [member.id for member in self.duck_guild.get_role(int(888106790192033792)).members]
-        users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(888578948445900831)).members])
-        users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(870049849414942771)).members])
-        users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(1122596775077875832)).members])
+        users_not_in_cache = [
+            member.id
+            for member in self.duck_guild.get_role(int(888106790192033792)).members
+        ]
+        users_not_in_cache.extend(
+            [
+                member.id
+                for member in self.duck_guild.get_role(int(888578948445900831)).members
+            ]
+        )
+        users_not_in_cache.extend(
+            [
+                member.id
+                for member in self.duck_guild.get_role(int(870049849414942771)).members
+            ]
+        )
+        users_not_in_cache.extend(
+            [
+                member.id
+                for member in self.duck_guild.get_role(int(1122596775077875832)).members
+            ]
+        )
         for key, value in Boosters.cache.copy().items():
             if not value:
                 try:
@@ -157,7 +174,7 @@ class Booster(commands.Cog):
 
     @staticmethod
     async def callback(
-            bot: commands.Bot, interaction: discord.Interaction, option: str
+        bot: commands.Bot, interaction: discord.Interaction, option: str
     ) -> discord.Embed:
         try:
             role_id = Boosters.cache[interaction.user.id]
@@ -194,8 +211,8 @@ class Booster(commands.Cog):
             await interaction.response.send_message(
                 embed=discord.Embed(
                     description=f"Invalid option: {option}. "
-                                f"Please contact the Bot Dev Team "
-                                f"for support!",
+                    f"Please contact the Bot Dev Team "
+                    f"for support!",
                     colour=0xFF0000,
                 )
             )
@@ -203,7 +220,7 @@ class Booster(commands.Cog):
 
     @staticmethod
     async def edit_icon_or_emoji(
-            bot: commands.Bot, interaction: discord.Interaction, role: discord.Role
+        bot: commands.Bot, interaction: discord.Interaction, role: discord.Role
     ):
         await interaction.response.defer()
         if not role:
@@ -217,8 +234,8 @@ class Booster(commands.Cog):
         def check():
             def inner_check(_message):
                 return (
-                        _message.author.id == interaction.user.id
-                        and _message.channel.id == interaction.channel.id
+                    _message.author.id == interaction.user.id
+                    and _message.channel.id == interaction.channel.id
                 )
 
             return inner_check
@@ -226,8 +243,8 @@ class Booster(commands.Cog):
         await interaction.channel.send(
             embed=discord.Embed(
                 description=f"Please send the new icon or emoji for your custom role. \n\n"
-                            f"Please note, the emoji must be from **this server** or a default emoji. Discord does "
-                            f"not support animated emojis at this time.",
+                f"Please note, the emoji must be from **this server** or a default emoji. Discord does "
+                f"not support animated emojis at this time.",
                 colour=role.colour,
             )
         )
@@ -239,7 +256,7 @@ class Booster(commands.Cog):
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"{interaction.user.mention}, you took too long to respond."
-                                f" Please re-run the command.",
+                    f" Please re-run the command.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
@@ -255,11 +272,11 @@ class Booster(commands.Cog):
                 file = file_emoji.content.split(" ")[0]
             else:
                 async with bot.session.get(  # type: ignore
-                        [
-                            x
-                            for x in interaction.guild.emojis
-                            if x.name.lower() == emojis[0][1]
-                        ][0].url
+                    [
+                        x
+                        for x in interaction.guild.emojis
+                        if x.name.lower() == emojis[0][1]
+                    ][0].url
                 ) as response:
                     if response.status != 200:
                         await interaction.channel.send(
@@ -278,7 +295,7 @@ class Booster(commands.Cog):
                     await interaction.channel.send(
                         embed=discord.Embed(
                             description=f"{interaction.user.mention}, there was an error with your request. "
-                                        f"Please try again.",
+                            f"Please try again.",
                             colour=0xFF0000,
                         ),
                         mention_author=False,
@@ -290,7 +307,7 @@ class Booster(commands.Cog):
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"{interaction.user.mention}, There was an error getting your file/emoji. "
-                                f"Please try again.",
+                    f"Please try again.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
@@ -303,7 +320,7 @@ class Booster(commands.Cog):
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"{interaction.user.mention}, there was an error with your request. "
-                                f"Please try using a different emoji or a smaller image.",
+                    f"Please try using a different emoji or a smaller image.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
@@ -320,9 +337,9 @@ class Booster(commands.Cog):
 
     @staticmethod
     async def edit_color(
-            bot: commands.Bot,
-            interaction: discord.Interaction,
-            role: typing.Union[discord.Role, None],
+        bot: commands.Bot,
+        interaction: discord.Interaction,
+        role: typing.Union[discord.Role, None],
     ):
         await interaction.response.defer()
         if not role:
@@ -336,8 +353,8 @@ class Booster(commands.Cog):
         def check():
             def inner_check(_message):
                 return (
-                        _message.author.id == interaction.user.id
-                        and _message.channel.id == interaction.channel.id
+                    _message.author.id == interaction.user.id
+                    and _message.channel.id == interaction.channel.id
                 )
 
             return inner_check
@@ -345,8 +362,8 @@ class Booster(commands.Cog):
         await interaction.channel.send(
             embed=discord.Embed(
                 description=f"Please send a new colour for your "
-                            f"role. Use `None` if you want to clear "
-                            f"the colour.",
+                f"role. Use `None` if you want to clear "
+                f"the colour.",
                 colour=role.colour,
             ),
         )
@@ -358,7 +375,7 @@ class Booster(commands.Cog):
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"{interaction.user.mention}, you took too long to respond."
-                                f" Please re-run the command.",
+                    f" Please re-run the command.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
@@ -384,9 +401,9 @@ class Booster(commands.Cog):
                     await interaction.channel.send(
                         embed=discord.Embed(
                             description=f"{interaction.user.mention}, that's not a valid colour. "
-                                        f"Please re-run this command to try again.\nUse "
-                                        f"[this](https://htmlcolorcodes.com/color-picker/ "
-                                        f'"RGB Color Picker") link to pick a colour.',
+                            f"Please re-run this command to try again.\nUse "
+                            f"[this](https://htmlcolorcodes.com/color-picker/ "
+                            f'"RGB Color Picker") link to pick a colour.',
                             colour=0xFF0000,
                         ),
                         mention_author=True,
@@ -405,9 +422,9 @@ class Booster(commands.Cog):
 
     @staticmethod
     async def edit_name(
-            bot: commands.Bot,
-            interaction: discord.Interaction,
-            role: typing.Union[discord.Role, None],
+        bot: commands.Bot,
+        interaction: discord.Interaction,
+        role: typing.Union[discord.Role, None],
     ):
         await interaction.response.defer()
         if not role:
@@ -421,8 +438,8 @@ class Booster(commands.Cog):
         def check():
             def inner_check(_message):
                 return (
-                        _message.author.id == interaction.user.id
-                        and _message.channel.id == interaction.channel.id
+                    _message.author.id == interaction.user.id
+                    and _message.channel.id == interaction.channel.id
                 )
 
             return inner_check
@@ -441,23 +458,20 @@ class Booster(commands.Cog):
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"{interaction.user.mention}, you took too long to respond."
-                                f" Please re-run the command.",
+                    f" Please re-run the command.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
             )
             return
 
-        if (
-                len(message.content) < 2
-                or len(message.content) > 32
-        ):
+        if len(message.content) < 2 or len(message.content) > 32:
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"Your custom role name must be "
-                                f"inbetween 2 and "
-                                f"32 "
-                                f"characters. ({len(message.content)})",
+                    f"inbetween 2 and "
+                    f"32 "
+                    f"characters. ({len(message.content)})",
                     colour=0xFF0000,
                 ),
                 mention_author=True,
@@ -469,7 +483,7 @@ class Booster(commands.Cog):
             await interaction.channel.send(
                 embed=discord.Embed(
                     description=f"A role with that name already exists. "
-                                f"Please re-run this command to try again.",
+                    f"Please re-run this command to try again.",
                     colour=0xFF0000,
                 ),
                 mention_author=True,
@@ -488,9 +502,9 @@ class Booster(commands.Cog):
 
     @staticmethod
     async def delete(
-            bot: commands.Bot,
-            interaction: discord.Interaction,
-            role: typing.Union[discord.Role, None],
+        bot: commands.Bot,
+        interaction: discord.Interaction,
+        role: typing.Union[discord.Role, None],
     ):
         await interaction.response.defer()
         if role is None:
@@ -522,9 +536,11 @@ class Booster(commands.Cog):
             await role.delete(reason="Custom role deleted.")
         return discord.Embed(description="Goodbye!", colour=discord.Colour.green())
 
-    @commands.command(aliases=['br', 'boosterrole'])
+    @commands.command(aliases=["br", "boosterrole"])
     # booster | staff team | level 20
-    @commands.has_any_role(870049849414942771, 888578948445900831, 888106790192033792, 1122596775077875832)
+    @commands.has_any_role(
+        870049849414942771, 888578948445900831, 888106790192033792, 1122596775077875832
+    )
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.max_concurrency(1, commands.BucketType.user)
     async def custom_role(self, ctx: commands.Context) -> None:
@@ -544,21 +560,21 @@ class Booster(commands.Cog):
         await view.wait()  # Prevents the command from being executed until the user has selected an option.
 
     async def setup_custom_role(
-            self, ctx: commands.Context
+        self, ctx: commands.Context
     ) -> typing.Union[discord.Role, None]:
         def check():
             def inner_check(_message):
                 return (
-                        _message.author == ctx.author
-                        and _message.channel.id == ctx.channel.id
+                    _message.author == ctx.author
+                    and _message.channel.id == ctx.channel.id
                 )
 
             return inner_check
 
         embed = discord.Embed(
             description=f"{ctx.author.mention}, We thank you for boosting our server! "
-                        f"<a:scoldsoncrackhelp:1115303711963623494>\n\nTo setup your "
-                        f"custom role, please send the role of your name in chat now.",
+            f"<a:scoldsoncrackhelp:1115303711963623494>\n\nTo setup your "
+            f"custom role, please send the role of your name in chat now.",
             color=0xF47FFF,
             timestamp=discord.utils.utcnow(),
         )
@@ -572,21 +588,18 @@ class Booster(commands.Cog):
             await ctx.reply(
                 embed=discord.Embed(
                     description=f"{ctx.author.mention}, you took too long to respond. "
-                                f"Please re-run the command.",
+                    f"Please re-run the command.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
             )
             return
-        if (
-                len(message.content) < 2
-                or len(message.content) > 32
-        ):
+        if len(message.content) < 2 or len(message.content) > 32:
             await ctx.reply(
                 embed=discord.Embed(
                     description=f"Your custom role name must be "
-                                f"inbetween 2 and 32 "
-                                f"characters. ({len(message.content)})",
+                    f"inbetween 2 and 32 "
+                    f"characters. ({len(message.content)})",
                     colour=0xFF0000,
                 ),
                 mention_author=True,
@@ -596,7 +609,7 @@ class Booster(commands.Cog):
             await ctx.reply(
                 embed=discord.Embed(
                     description=f"A role with that name already exists. "
-                                f"Please re-run this command to try again.",
+                    f"Please re-run this command to try again.",
                     colour=0xFF0000,
                 ),
                 mention_author=True,
@@ -605,9 +618,9 @@ class Booster(commands.Cog):
         await ctx.reply(
             embed=discord.Embed(
                 description=f"Alright, {ctx.author.mention}, you decided to use "
-                            f"**{message.content}** as your custom role name. "
-                            f"Now send a colour in chat! Send `None` if you don't want a "
-                            f"colour.",
+                f"**{message.content}** as your custom role name. "
+                f"Now send a colour in chat! Send `None` if you don't want a "
+                f"colour.",
                 colour=0xF47FFF,
             ),
             mention_author=True,
@@ -621,7 +634,7 @@ class Booster(commands.Cog):
             await ctx.reply(
                 embed=discord.Embed(
                     description=f"{ctx.author.mention}, you took too long to respond. "
-                                f"Please re-run the command.",
+                    f"Please re-run the command.",
                     colour=0xFF0000,
                 ),
                 mention_author=False,
@@ -646,9 +659,9 @@ class Booster(commands.Cog):
                     await ctx.reply(
                         embed=discord.Embed(
                             description=f"{ctx.author.mention}, that's not a valid colour. "
-                                        f"Please re-run this command to try again.\nUse "
-                                        f"[this](https://htmlcolorcodes.com/color-picker/ "
-                                        f'"RGB Color Picker") link to pick a colour. Or input a color by it\'s name.',
+                            f"Please re-run this command to try again.\nUse "
+                            f"[this](https://htmlcolorcodes.com/color-picker/ "
+                            f'"RGB Color Picker") link to pick a colour. Or input a color by it\'s name.',
                             colour=0xFF0000,
                         ),
                         mention_author=True,
@@ -660,15 +673,15 @@ class Booster(commands.Cog):
             embeds=[
                 discord.Embed(
                     description=f"Alright, {ctx.author.mention}, you decided to use"
-                                f" **{message.content}** as your custom role name, and you "
-                                f"decided to use **{str(thy_color).upper()}** as your "
-                                f"custom role colour",
+                    f" **{message.content}** as your custom role name, and you "
+                    f"decided to use **{str(thy_color).upper()}** as your "
+                    f"custom role colour",
                     colour=thy_color,
                 ),
                 discord.Embed(
                     description=f"If you want to ever change your custom role name / colour "
-                                f"or to assign an emoji / picture to it, "
-                                f"just re-run this command!",
+                    f"or to assign an emoji / picture to it, "
+                    f"just re-run this command!",
                     colour=0xF47FFF,
                 ),
             ]
@@ -688,7 +701,7 @@ class Booster(commands.Cog):
                 await ctx.send(
                     embed=discord.Embed(
                         description=f"An error occurred. The custom role threshold role "
-                                    f"doesn't exist. Please contact a staff member.",
+                        f"doesn't exist. Please contact a staff member.",
                         colour=0xFF0000,
                     )
                 )
@@ -720,9 +733,9 @@ class Booster(commands.Cog):
     def generate_embed(role: discord.Role) -> discord.Embed:
         embed = discord.Embed(
             description=f"The name of your custom role is currently **`{role.name}`** "
-                        f"({role.mention}).\n"
-                        f"The hex is {str(role.colour).upper()}\n\n"
-                        f"",
+            f"({role.mention}).\n"
+            f"The hex is {str(role.colour).upper()}\n\n"
+            f"",
             colour=role.colour,
             timestamp=role.created_at,
         )
@@ -743,7 +756,7 @@ class Booster(commands.Cog):
             after.get_role(888106790192033792),
             after.get_role(870049849414942771),
             after.get_role(888578948445900831),
-            after.get_role(1122596775077875832)
+            after.get_role(1122596775077875832),
         ]
         for role in allowed_roles:
             if role in after.roles:
