@@ -3,7 +3,7 @@ import json
 import traceback
 
 import aiohttp
-import aioredis
+from redis import asyncio as aioredis
 import discord
 import discord.ext
 from discord.ext import commands
