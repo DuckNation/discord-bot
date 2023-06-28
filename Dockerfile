@@ -1,4 +1,4 @@
-FROM 3.10.12-alpine3.18
+FROM python:3.10.12-alpine3.18
 
 ARG BOT_TOKEN
 ARG REDIS_IP
