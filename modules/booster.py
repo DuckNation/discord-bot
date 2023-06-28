@@ -762,11 +762,10 @@ class Booster(commands.Cog):
             if role in after.roles:
                 if after.id not in Boosters.cache.keys():
                     await Boosters.insert(after.id, None)
-                    return
+                return
         if after.id in Boosters.cache.keys():
             await self.delete_custom_role(after.guild, Boosters.cache[after.id])
             await Boosters.delete(after.id)
-            await after.edit(reason="Boost ended?")
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
