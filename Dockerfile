@@ -1,4 +1,4 @@
-FROM python:3.10.12-bullseye as builder
+FROM 3.10.12-alpine3.18
 
 ARG BOT_TOKEN
 ARG REDIS_IP
@@ -20,14 +20,8 @@ WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
-
-FROM python:3.10.12-slim-buster
-
-WORKDIR /app
-
-COPY --from=builder /app /app
 
 CMD ["python", "/app/main.py"]
