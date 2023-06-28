@@ -12,11 +12,7 @@ from modules.booster_redis import Boosters
 
 config = json.load(open("config.json"))
 
-_modules = (
-    "jishaku",
-    "modules.smp",
-    "modules.booster"
-)
+_modules = ("jishaku", "modules.smp", "modules.booster")
 
 
 class Duck(commands.Bot):
@@ -48,8 +44,10 @@ class Duck(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.redis: aioredis.ConnectionPool = await aioredis.from_url(
-            f"redis://{config['redis-ip']}:{config['redis-port']}", username="default",
-            password=config["redis-password"])
+            f"redis://{config['redis-ip']}:{config['redis-port']}",
+            username="default",
+            password=config["redis-password"],
+        )
         self.session = aiohttp.ClientSession()
         await Boosters(self.redis).load_cache()
         for ext in _modules:
@@ -78,6 +76,4 @@ class Duck(commands.Bot):
 #         # await Duck().sync()
 
 if __name__ == "__main__":
-    asyncio.run(
-        Duck().start(config["bot-token"], reconnect=True)
-    )
+    asyncio.run(Duck().start(config["bot-token"], reconnect=True))
