@@ -1,4 +1,4 @@
-FROM python:3.10-bullseye as builder
+FROM python:3.10.12-bullseye as builder
 
 ARG BOT_TOKEN
 ARG REDIS_IP
