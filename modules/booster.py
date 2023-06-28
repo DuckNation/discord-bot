@@ -136,6 +136,7 @@ class Booster(commands.Cog):
         users_not_in_cache = [member.id for member in self.duck_guild.get_role(int(888106790192033792)).members]
         users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(888578948445900831)).members])
         users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(870049849414942771)).members])
+        users_not_in_cache.extend([member.id for member in self.duck_guild.get_role(int(1122596775077875832)).members])
         for key, value in Boosters.cache.copy().items():
             if not value:
                 try:
@@ -523,7 +524,7 @@ class Booster(commands.Cog):
 
     @commands.command(aliases=['br', 'boosterrole'])
     # booster | staff team | level 20
-    @commands.has_any_role(870049849414942771, 888578948445900831, 888106790192033792)
+    @commands.has_any_role(870049849414942771, 888578948445900831, 888106790192033792, 1122596775077875832)
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.max_concurrency(1, commands.BucketType.user)
     async def custom_role(self, ctx: commands.Context) -> None:
@@ -741,7 +742,8 @@ class Booster(commands.Cog):
         allowed_roles = [
             after.get_role(888106790192033792),
             after.get_role(870049849414942771),
-            after.get_role(888578948445900831)
+            after.get_role(888578948445900831),
+            after.get_role(1122596775077875832)
         ]
         for role in allowed_roles:
             if role in after.roles:

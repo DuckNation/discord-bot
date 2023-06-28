@@ -1,0 +1,24 @@
+name: Build Docker Image
+
+on:
+  push
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          REDIS_IP: ${{ secrets.REDIS_IP }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          API_KEY: ${{ secrets.API_KEY }}
+          WSS_URL: ${{ secrets.WSS_URL }}
+          API_URL: ${{ secrets.API_URL }}
+
+        run: docker build --build-arg BOT_TOKEN=$BOT_TOKEN --build-arg REDIS_IP=$REDIS_IP --build-arg REDIS_PORT=$REDIS_PORT --build-arg REDIS_PASSWORD=$REDIS_PASSWORD --build-arg API_KEY=$API_KEY --build-arg WSS_URL=$WSS_URL --build-arg API_URL=$API_URL -t discord-bot:latest .

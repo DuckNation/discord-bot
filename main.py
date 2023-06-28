@@ -24,6 +24,8 @@ class Duck(commands.Bot):
         self.redis = None
         self.sqlite = None
         self.api_key: str = config["api-key"]
+        self.api_url: str = config["api-url"]
+        self.wss_url: str = config["wss-url"]
         allowed_mentions = discord.AllowedMentions(
             roles=False, everyone=False, users=True
         )
