@@ -1,16 +1,14 @@
 import asyncio
-import json
+import os
 import traceback
 
 import aiohttp
-from redis import asyncio as aioredis
 import discord
 import discord.ext
 from discord.ext import commands
+from redis import asyncio as aioredis
 
 from modules.booster_redis import Boosters
-
-config = json.load(open("config.json"))
 
 _modules = ("jishaku", "modules.smp", "modules.booster")
 
@@ -19,9 +17,9 @@ class Duck(commands.Bot):
     def __init__(self, **kwargs):
         self.redis = None
         self.sqlite = None
-        self.api_key: str = config["api-key"]
-        self.api_url: str = config["api-url"]
-        self.wss_url: str = config["wss-url"]
+        self.api_key: str = os.getenv("API_KEY")
+        self.api_url: str = os.getenv("API_URL")
+        self.wss_url: str = os.getenv("WSS_URL")
         allowed_mentions = discord.AllowedMentions(
             roles=False, everyone=False, users=True
         )
@@ -44,9 +42,9 @@ class Duck(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.redis: aioredis.ConnectionPool = await aioredis.from_url(
-            f"redis://{config['redis-ip']}:{config['redis-port']}",
+            f"redis://{os.getenv('REDIS_IP')}:{os.getenv('redis-port')}",
             username="default",
-            password=config["redis-password"],
+            password=os.getenv("redis-password"),
         )
         self.session = aiohttp.ClientSession()
         await Boosters(self.redis).load_cache()
@@ -76,4 +74,4 @@ class Duck(commands.Bot):
 #         # await Duck().sync()
 
 if __name__ == "__main__":
-    asyncio.run(Duck().start(config["bot-token"], reconnect=True))
+    asyncio.run(Duck().start(os.getenv("bot-token"), reconnect=True))
