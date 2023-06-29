@@ -7,13 +7,15 @@ import discord
 import discord.ext
 from discord.ext import commands
 from redis import asyncio as aioredis
-
+from dotenv import load_dotenv
 from modules.booster_redis import Boosters
 
 _modules = ("jishaku", "modules.smp", "modules.booster")
 
 
 class Duck(commands.Bot):
+    load_dotenv()
+
     def __init__(self, **kwargs):
         self.redis = None
         self.sqlite = None
