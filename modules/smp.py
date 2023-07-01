@@ -119,6 +119,15 @@ class SMP(commands.Cog):
                         pass
 
     @commands.command()
+    async def verify(self, ctx: commands.Context, pin: str):
+        data = await self.session.post(
+            f"{self.bot.api_url}/verification/verify?key={self.bot.api_key}&uid={ctx.author.id}&pin={pin}")
+        _json = await data.json()
+        if data.status != 200:
+            return await ctx.send(_json['detail'])
+        await ctx.send("Successfully verified. Adding to your channels in a few seconds.")
+
+    @commands.command()
     async def who(self, ctx: commands.Context, user: discord.Member | int | None):
         if not user:
             return await ctx.send("Please specify a user.")
