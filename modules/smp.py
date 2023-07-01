@@ -1,9 +1,14 @@
 import asyncio
+import pprint
 
 import aiohttp
 import discord
 import websockets
 from discord.ext import commands, tasks
+
+
+def get_hex(rgb: tuple):
+    return '#%02x%02x%02x' % rgb
 
 
 class SMP(commands.Cog):
@@ -21,17 +26,19 @@ class SMP(commands.Cog):
             self.ready = True
             await self.bot.wait_until_ready()
             self.channel: discord.TextChannel = self.bot.get_channel(927300714508730418)
-            chat_channels = await self.session.get(f"{self.bot.api_url}/chats/get?key={self.bot.api_key}&uuid_or_id=False")
+            chat_channels = await self.session.get(
+                f"{self.bot.api_url}/chats/better-get?key={self.bot.api_key}")
             chat_channels = await chat_channels.json()
-            chat_channels.append({"global": 927300714508730418})
+            chat_channels.append({"name": "global", "uuid": "global", "discordId": self.channel.id})
+            pprint.pp(chat_channels)
 
             for entry in chat_channels:
-                path = next(iter(entry))
-                path = entry[path]
-                channel_id = entry['discordId'] if 'discordId' in entry else None
+                path = entry["uuid"]
+                channel_id = entry["discordId"]
+                name = entry["name"]
 
                 if not channel_id:
-                    await self.create_channel(path, entry['name'])
+                    await self.create_channel(path, name)
                 else:
                     asyncio.ensure_future(self.connect(path, channel_id))
 
@@ -46,7 +53,6 @@ class SMP(commands.Cog):
             self.mapping["global"] = self.channel.id
 
     async def connect(self, path, channel_id):
-        print(f"{self.bot.wss_url}/{path}?key={self.bot.api_key}")
         async with websockets.connect(f"{self.bot.wss_url}/{path}?key={self.bot.api_key}") as ws:
             self.ws_mapping[channel_id] = ws
             self.mapping[path] = channel_id
@@ -70,8 +76,9 @@ class SMP(commands.Cog):
         if internal_id in self.mapping:
             return
         async with self.session.get(
-                f"{self.bot.api_url}/chats/get?key={self.bot.api_key}&chat_uuid={internal_id}") as resp:
+                f"{self.bot.api_url}/chats/get?key={self.bot.api_key}&chat_uuid={internal_id}&uuid_or_id=False") as resp:
             data = await resp.json()
+            print(data)
         _id = data['discordId'] if 'discordId' in data else None
         if 'discordId' not in data:
             thread = await self.channel.create_thread(type=None, invitable=True, auto_archive_duration=10080, name=name)
@@ -90,31 +97,43 @@ class SMP(commands.Cog):
         if message.author.bot:
             return
         if message.channel.id in self.ws_mapping:
-            hex_color = self.get_hex(message.author.top_role.color.to_rgb())
-            await self.ws_mapping[message.channel.id].send(f"chat;<blue>[Discord]</blue> <color:{hex_color}>{message.author.name}</color:{hex_color}><gray>:</gray> <reset>{message.content}")
+            hex_color = get_hex(message.author.top_role.color.to_rgb())
+            await self.ws_mapping[message.channel.id].send(
+                f"chat;<blue>[Discord]</blue> <color:{hex_color}>{message.author.name}</color:{hex_color}><gray>:</gray> <reset>{message.content}")
 
-    # @commands.Cog.listener()
-    async def on_thread_member_join(self, thread_member: discord.ThreadMember):
-        guild = thread_member.thread.guild
-        if guild.get_member(thread_member.id).bot:
-            return
-        if guild.get_member(thread_member.id).guild_permissions.manage_messages:
-            return
-        await thread_member.thread.last_message.add_reaction("🔃")
-        data = await self.session.get(f"{self.bot.api_url}/info/stats?key={self.bot.api_key}&uid={thread_member.id}")
-        if data.status != 200:
-            await thread_member.thread.remove_user(discord.Object(thread_member.id))
-            await thread_member.thread.send(embed=discord.Embed(description="That member has not connected to the server!", colour=discord.Colour.red()))
-            return
+    @commands.command()
+    async def unverify(self, ctx: commands.Context):
+        to_remove = await self.session.delete(
+            f"{self.bot.api_url}/verification/unverify?key={self.bot.api_key}&uid={ctx.author.id}")
+        if not to_remove.status == 200:
+            return await ctx.send("You are not verified.")
+        await ctx.send("Successfully unverified.")
+        # to_remove = await to_remove.json()
+        # await self.ws_mapping['global'].send(f"leave;{to_remove['name']}")
+        for thread in ctx.channel.threads:
+            for mem in thread.members:
+                if mem.id == ctx.author.id:
+                    try:
+                        await thread.remove_user(discord.Object(id=ctx.author.id))
+                    except discord.HTTPException:
+                        pass
+
+    @commands.command()
+    async def who(self, ctx: commands.Context, user: discord.Member | int | None):
+        if not user:
+            return await ctx.send("Please specify a user.")
+
+        data = await self.session.get(
+            f"{self.bot.api_url}/info/stats?key={self.bot.api_key}&uid={user.id if isinstance(user, discord.Member) else user}")
         data = await data.json()
-        if not data['uid']:
-            await thread_member.thread.remove_user(discord.Object(thread_member.id))
-            await thread_member.thread.send(embed=discord.Embed(description="That member has not verified their discord!", colour=discord.Colour.red()))
-            return
-        await thread_member.thread.send(embed=discord.Embed(description=f"Welcome <@{thread_member.id}>! ({data['username']})", colour=discord.Colour.green()))
+        if not data:
+            return await ctx.send("User not found.")
+        if "detail" in data:
+            return await ctx.send(data['detail'])
 
-    def get_hex(self, rgb: tuple):
-        return '#%02x%02x%02x' % rgb
+        return await ctx.send(embed=discord.Embed(description=f"Username: {data['username']}\n"
+                                                              f"UUID: {data['_id']}\n"
+                                                              f"Discord: <@{data['uid']}>\n"))
 
     async def remove_player(self, channel_id, player_id):
         request = await self.session.get(f"{self.bot.api_url}/info/stats?key={self.bot.api_key}&uid={player_id}")

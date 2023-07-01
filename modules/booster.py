@@ -132,6 +132,8 @@ class Booster(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        await self.bot.wait_until_ready()
+        self.duck_guild: discord.Guild = self.bot.get_guild(790774812690743306)
         users_not_in_cache = [
             member.id
             for member in self.duck_guild.get_role(int(1121175332205101097)).members

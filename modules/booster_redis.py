@@ -16,7 +16,7 @@ class Boosters:
     @staticmethod
     async def insert(_id, role_id):
         Boosters.cache[_id] = role_id
-        await Boosters.redis.hset("boosters", _id, role_id)
+        await Boosters.redis.hset("boosters", _id, role_id if role_id else 0)
 
     @staticmethod
     async def load_cache():

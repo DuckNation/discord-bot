@@ -76,4 +76,4 @@ class Duck(commands.Bot):
 #         # await Duck().sync()
 
 if __name__ == "__main__":
-    asyncio.run(Duck().start(os.getenv("BOT_TOKEN"), reconnect=True))
+    Duck().run(os.getenv("BOT_TOKEN"), reconnect=True)
