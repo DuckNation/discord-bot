@@ -48,13 +48,20 @@ class SMPListener(commands.Cog):
         else:
             return
 
-        command = "lpv user {username} parent add group.%s" % SMPListener.role_mapping[role_added.id]
+        command = (
+            "lpv user {username} parent add group.%s"
+            % SMPListener.role_mapping[role_added.id]
+        )
 
-        resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}")
+        resp = await self.bot.session.patch(
+            f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}"
+        )
         if resp.status != 200:
             try:
-                await after.send("An error occurred while setting your permissions. Try verifying your account maybe, "
-                                 f"or contact a staff member.\n\nRole(s) (add): {role_added}")
+                await after.send(
+                    "An error occurred while setting your permissions. Try verifying your account maybe, "
+                    f"or contact a staff member.\n\nRole(s) (add): {role_added}"
+                )
             except discord.Forbidden:
                 pass
             return
@@ -74,13 +81,20 @@ class SMPListener(commands.Cog):
         else:
             return
 
-        command = "lpv user {username} parent remove group.%s" % SMPListener.role_mapping[role_removed.id]
+        command = (
+            "lpv user {username} parent remove group.%s"
+            % SMPListener.role_mapping[role_removed.id]
+        )
 
-        resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}")
+        resp = await self.bot.session.patch(
+            f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}"
+        )
         if resp.status != 200:
             try:
-                await after.send("An error occurred while setting your permissions. Try verifying your account maybe, "
-                                 f"or contact a staff member.\n\nRole(s) (remove): {role_removed}")
+                await after.send(
+                    "An error occurred while setting your permissions. Try verifying your account maybe, "
+                    f"or contact a staff member.\n\nRole(s) (remove): {role_removed}"
+                )
             except discord.Forbidden:
                 pass
             return
