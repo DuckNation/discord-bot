@@ -50,7 +50,7 @@ class SMPListener(commands.Cog):
 
         command = "lpv user {username} parent add group.%s" % SMPListener.role_mapping[role_added.id]
 
-        resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}")
+        resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}")
         if resp.status != 200:
             try:
                 await after.send("An error occurred while setting your permissions. Try verifying your account maybe, "
@@ -64,8 +64,8 @@ class SMPListener(commands.Cog):
         if after.roles != before.roles:
             role_removed = None
 
-            for role in after.roles:
-                if role not in before.roles:
+            for role in before.roles:
+                if role not in after.roles:
                     role_removed = role
                     break
 
@@ -76,7 +76,7 @@ class SMPListener(commands.Cog):
 
         command = "lpv user {username} parent remove group.%s" % SMPListener.role_mapping[role_removed.id]
 
-        resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}")
+        resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}")
         if resp.status != 200:
             try:
                 await after.send("An error occurred while setting your permissions. Try verifying your account maybe, "
