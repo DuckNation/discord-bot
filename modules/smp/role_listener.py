@@ -48,7 +48,7 @@ class SMPListener(commands.Cog):
         else:
             return
 
-        command = "lpv user {username} parent add group.%s" % SMPListener.role_mapping[role_added.id]
+        command = "lp user {username} parent add %s" % SMPListener.role_mapping[role_added.id]
 
         resp = await self.bot.session.patch(f"{self.bot.api_url}/info/permissions?uid={after.id}&permission={command}&key={self.bot.api_key}")
         if resp.status != 200:
