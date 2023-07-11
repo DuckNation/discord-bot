@@ -135,7 +135,7 @@ class SMP(commands.Cog):
                             if not path == "global":
                                 should_connect = False
                                 break
-            except websockets.ConnectionClosed:
+            except websockets.ConnectionClosedError | websockets.ConnectionClosedError:
                 await self.chat(
                     self.mapping[path], "Connection closed to chat, reconnecting..."
                 )
