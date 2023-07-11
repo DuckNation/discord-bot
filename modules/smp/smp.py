@@ -17,7 +17,7 @@ def get_hex(rgb: tuple):
 class SMP(commands.Cog):
     def __init__(self, bot):
         self.ready = False
-        self.bot = bot
+        self.bot: commands.Bot = bot
         self.session: aiohttp.ClientSession = bot.session
         self.mapping = {}
         self.ws_mapping = {}
@@ -33,7 +33,6 @@ class SMP(commands.Cog):
                 f"{self.bot.api_url}/chats/better-get?key={self.bot.api_key}")
             chat_channels = await chat_channels.json()
             chat_channels.append({"name": "global", "uuid": "global", "discordId": self.channel.id})
-            pprint.pp(chat_channels)
 
             for entry in chat_channels:
                 path = entry["uuid"]
@@ -50,10 +49,47 @@ class SMP(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        if not self.ready:
-            self.ready = True
-            self.channel = self.bot.get_channel(927300714508730418)
-            self.mapping["global"] = self.channel.id
+        self.channel = self.bot.get_channel(927300714508730418)
+        self.mapping["global"] = self.channel.id
+
+            # await asyncio.sleep(2)
+
+        await self.add_users()
+
+    async def add_users(self):
+        guild = self.bot.get_guild(790774812690743306)
+        for member in guild.members:
+            if member.bot:
+                continue
+
+            data = await self.session.get(
+                f"{self.bot.api_url}/info/stats?key={self.bot.api_key}&uid={member.id}")
+            data = await data.json()
+            if 'detail' in data:
+                continue
+
+            channels = await self.session.get(
+                f"{self.bot.api_url}/chats/better-get?key={self.bot.api_key}&player_uuid={data['uuid']}")
+
+            channels = await channels.json()
+
+            for channel in channels:
+                if 'discordId' not in channel:
+                    continue
+                if channel["discordId"] == self.channel.id:
+                    continue
+
+                thread: discord.Thread = self.bot.get_channel(channel["discordId"])
+
+                if not thread:
+                    continue
+
+                try:
+                    await thread.add_user(discord.Object(id=member.id))
+                except discord.Forbidden:
+                    pass
+                await asyncio.sleep(0.5)
+
 
     async def connect(self, path, channel_id):
         should_connect = True
@@ -99,7 +135,6 @@ class SMP(commands.Cog):
         async with self.session.get(
                 f"{self.bot.api_url}/chats/get?key={self.bot.api_key}&chat_uuid={internal_id}&uuid_or_id=False") as resp:
             data = await resp.json()
-            print(data)
         _id = data['discordId'] if 'discordId' in data else None
         if 'discordId' not in data:
             thread = await self.channel.create_thread(type=None, invitable=True, auto_archive_duration=10080, name=name)
@@ -129,8 +164,6 @@ class SMP(commands.Cog):
         if not to_remove.status == 200:
             return await ctx.send("You are not verified.")
         await ctx.send("Successfully unverified.")
-        # to_remove = await to_remove.json()
-        # await self.ws_mapping['global'].send(f"leave;{to_remove['name']}")
         for thread in self.channel.threads:
             for mem in thread.members:
                 if mem.id == ctx.author.id:
@@ -169,8 +202,8 @@ class SMP(commands.Cog):
             return await ctx.send(data['detail'])
 
         return await ctx.send(embed=discord.Embed(description=f"Username: {data['username']}\n"
-                                                              f"UUID: {data['_id']}\n"
-                                                              f"Discord: <@{data['uid']}>\n"))
+                                                              f"UUID: {data['uuid']}\n"
+                                                              f"Discord: <@{data['uid'] if 'uid' in data else 'NA'}>\n"))
 
     async def remove_player(self, channel_id, player_id):
         request = await self.session.get(f"{self.bot.api_url}/info/stats?key={self.bot.api_key}&uid={player_id}")
