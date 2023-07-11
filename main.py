@@ -9,7 +9,12 @@ from redis import asyncio as aioredis
 from dotenv import load_dotenv
 from modules.booster.booster_redis import Boosters
 
-_modules = ("jishaku", "modules.smp.smp", "modules.booster.booster", "modules.smp.role_listener")
+_modules = (
+    "jishaku",
+    "modules.smp.smp",
+    "modules.booster.booster",
+    "modules.smp.role_listener",
+)
 
 
 class Duck(commands.Bot):
