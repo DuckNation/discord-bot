@@ -8,7 +8,7 @@ import discord  # noqa
 import matplotlib.colors
 from discord.ext import commands  # noqa
 
-from modules.booster_redis import Boosters
+from modules.booster.booster_redis import Boosters
 
 
 class Dropdown(discord.ui.Select):

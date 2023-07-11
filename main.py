@@ -1,4 +1,3 @@
-import asyncio
 import os
 import traceback
 
@@ -8,9 +7,9 @@ import discord.ext
 from discord.ext import commands
 from redis import asyncio as aioredis
 from dotenv import load_dotenv
-from modules.booster_redis import Boosters
+from modules.booster.booster_redis import Boosters
 
-_modules = ("jishaku", "modules.smp", "modules.booster")
+_modules = ("jishaku", "modules.smp.smp", "modules.booster.booster", "modules.smp.role_listener")
 
 
 class Duck(commands.Bot):

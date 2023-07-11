@@ -1,10 +1,13 @@
 import asyncio
 import pprint
+import traceback
 
 import aiohttp
 import discord
 import websockets
 from discord.ext import commands, tasks
+
+from modules.smp.role_listener import get_highest_level_role, SMPListener
 
 
 def get_hex(rgb: tuple):
@@ -53,24 +56,42 @@ class SMP(commands.Cog):
             self.mapping["global"] = self.channel.id
 
     async def connect(self, path, channel_id):
-        async with websockets.connect(f"{self.bot.wss_url}/{path}?key={self.bot.api_key}") as ws:
-            self.ws_mapping[channel_id] = ws
-            self.mapping[path] = channel_id
-            while True:
-                msg = await ws.recv()
-                split = msg.split(";")
-                if split[0] == "create_discord_channel":
-                    await self.create_channel(split[1], split[2])
-                if split[0] == "remove_player":
-                    await self.remove_player(split[1], split[2])
-                if split[0] == "update":
-                    await self.channel.edit(topic=split[1])
-                if split[0] == "chat":
-                    await self.chat(self.mapping[path], msg.split(";", maxsplit=1)[1])
-                if split[0] == "join":
-                    await self.channel.send(embed=discord.Embed(description=split[1], colour=discord.Colour.green()))
-                if split[0] == "leave":
-                    await self.channel.send(embed=discord.Embed(description=split[1], colour=discord.Colour.red()))
+        should_connect = True
+        while should_connect:
+            try:
+                print(f"Connecting to {path}")
+                async with websockets.connect(f"{self.bot.wss_url}/{path}?key={self.bot.api_key}") as ws:
+                    self.ws_mapping[channel_id] = ws
+                    self.mapping[path] = channel_id
+                    while True:
+                        msg = await ws.recv()
+                        split = msg.split(";")
+                        if split[0] == "create_discord_channel":
+                            await self.create_channel(split[1], split[2])
+                        if split[0] == "remove_player":
+                            await self.remove_player(split[1], split[2])
+                        if split[0] == "update":
+                            await self.channel.edit(topic=split[1])
+                        if split[0] == "chat":
+                            await self.chat(self.mapping[path], msg.split(";", maxsplit=1)[1])
+                        if split[0] == "join":
+                            await self.channel.send(
+                                embed=discord.Embed(description=split[1], colour=discord.Colour.green()))
+                        if split[0] == "leave":
+                            await self.channel.send(
+                                embed=discord.Embed(description=split[1], colour=discord.Colour.red()))
+                        if split[0] == "delete_discord_channel":
+                            await self.bot.get_channel(int(split[1])).delete()
+                            if not path == "global":
+                                should_connect = False
+                                break
+            except websockets.ConnectionClosed:
+                await self.chat(self.mapping[path], "Connection closed to chat, reconnecting...")
+                await asyncio.sleep(10)
+            except Exception as e:
+                traceback.print_tb(e.__traceback__)
+                await self.chat(self.mapping[path], "I was unable to reconnect to the chat, spam haappi.")
+                return
 
     async def create_channel(self, internal_id: str, name: str):
         if internal_id in self.mapping:
@@ -110,7 +131,7 @@ class SMP(commands.Cog):
         await ctx.send("Successfully unverified.")
         # to_remove = await to_remove.json()
         # await self.ws_mapping['global'].send(f"leave;{to_remove['name']}")
-        for thread in ctx.channel.threads:
+        for thread in self.channel.threads:
             for mem in thread.members:
                 if mem.id == ctx.author.id:
                     try:
@@ -125,7 +146,14 @@ class SMP(commands.Cog):
         _json = await data.json()
         if data.status != 200:
             return await ctx.send(_json['detail'])
-        await ctx.send("Successfully verified. Adding to your channels in a few seconds.")
+        await ctx.send(_json['message'])
+
+        role = get_highest_level_role(ctx.author.roles)
+
+        command = "lpv user {username} parent add group.%s" % SMPListener.role_mapping[role.id]
+
+        await self.bot.session.patch(
+            f"{self.bot.api_url}/info/permissions?uid={ctx.author.id}&permission={command}&key={self.bot.api_key}")
 
     @commands.command()
     async def who(self, ctx: commands.Context, user: discord.Member | int | None):
