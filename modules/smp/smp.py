@@ -158,7 +158,11 @@ class SMP(commands.Cog):
         ) as resp:
             data = await resp.json()
         _id = data["discordId"] if "discordId" in data else None
-        if "discordId" not in data or data['discordId'] is None or data['discordId'] == -1:
+        if (
+            "discordId" not in data
+            or data["discordId"] is None
+            or data["discordId"] == -1
+        ):
             thread = await self.channel.create_thread(
                 type=None, invitable=True, auto_archive_duration=10080, name=name
             )
