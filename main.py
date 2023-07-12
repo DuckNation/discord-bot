@@ -65,7 +65,7 @@ class Duck(commands.Bot):
 
     async def close(self) -> None:
         await self.session.close()
-        await self.sqlite.close()
+        # await self.sqlite.close()
         await self.close()
 
     async def on_ready(self):

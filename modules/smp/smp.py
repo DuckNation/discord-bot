@@ -39,7 +39,8 @@ class SMP(commands.Cog):
 
             for entry in chat_channels:
                 path = entry["uuid"]
-                channel_id = entry["discordId"]
+                channel_id = entry["discordId"] if "discordId" in entry else None
+                channel_id = None if channel_id == -1 else channel_id
                 name = entry["name"]
 
                 if not channel_id:
@@ -77,6 +78,7 @@ class SMP(commands.Cog):
             )
 
             channels = await channels.json()
+            print(channels)
 
             for channel in channels:
                 if "discordId" not in channel:
@@ -156,7 +158,7 @@ class SMP(commands.Cog):
         ) as resp:
             data = await resp.json()
         _id = data["discordId"] if "discordId" in data else None
-        if "discordId" not in data or data['discordId'] == -1:
+        if "discordId" not in data or data['discordId'] is None or data['discordId'] == -1:
             thread = await self.channel.create_thread(
                 type=None, invitable=True, auto_archive_duration=10080, name=name
             )
