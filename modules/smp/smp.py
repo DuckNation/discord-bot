@@ -182,7 +182,7 @@ class SMP(commands.Cog):
         if message.channel.id in self.ws_mapping:
             hex_color = get_hex(message.author.top_role.color.to_rgb())
             await self.ws_mapping[message.channel.id].send(
-                f"chat;<blue>[Discord]</blue> <color:{hex_color}>{message.author.name}</color:{hex_color}><gray>:</gray> <reset>{message.content}"
+                f"chat;<blue>[Discord]</blue> <color:{hex_color}>{message.author.name}</color:{hex_color}><gray>:</gray> <reset>{message.clean_content}"
             )
 
     @commands.command()
