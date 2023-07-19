@@ -29,12 +29,16 @@ class SMP(commands.Cog):
             self.ready = True
             await self.bot.wait_until_ready()
             self.channel: discord.TextChannel = self.bot.get_channel(927300714508730418)
+            self.channel_two: discord.TextChannel = self.bot.get_channel(867471765596274711)
             chat_channels = await self.session.get(
                 f"{self.bot.api_url}/chats/better-get?key={self.bot.api_key}"
             )
             chat_channels = await chat_channels.json()
             chat_channels.append(
                 {"name": "global", "uuid": "global", "discordId": self.channel.id}
+            )
+            chat_channels.append(
+                {"name": "rushie", "uuid": "rushie", "discordId": self.channel_two.id}
             )
 
             for entry in chat_channels:
@@ -55,6 +59,9 @@ class SMP(commands.Cog):
     async def on_ready(self):
         self.channel = self.bot.get_channel(927300714508730418)
         self.mapping["global"] = self.channel.id
+
+        self.channel = self.bot.get_channel(867471765596274711)
+        self.mapping["rushie"] = self.channel.id
 
         # await asyncio.sleep(2)
 
