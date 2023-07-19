@@ -29,7 +29,9 @@ class SMP(commands.Cog):
             self.ready = True
             await self.bot.wait_until_ready()
             self.channel: discord.TextChannel = self.bot.get_channel(927300714508730418)
-            self.channel_two: discord.TextChannel = self.bot.get_channel(867471765596274711)
+            self.channel_two: discord.TextChannel = self.bot.get_channel(
+                867471765596274711
+            )
             chat_channels = await self.session.get(
                 f"{self.bot.api_url}/chats/better-get?key={self.bot.api_key}"
             )
